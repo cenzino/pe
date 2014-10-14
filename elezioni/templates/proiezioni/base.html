@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Proiezioni{% endblock %}
+
+{% block brand %}{% endblock %}
+
+{% block navmenu %}
+<li><a href="{% url 'proiezioni_index' elezione.id %}"><span class="glyphicon glyphicon-user"></span> Candidati</a></li>
+<li><a href="{% url 'proiezioni_candidati2' elezione.id %}"><span class="glyphicon glyphicon-user"></span> Candidati2</a></li>
+<li><a href="{% url 'proiezioni_liste' elezione.id %}"><span class="glyphicon glyphicon-list-alt"></span> Liste</a></li>
+{% endblock %}
+
+{% block content %}
+{% endblock %}

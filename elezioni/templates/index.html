@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Proiezioni Candidati{% endblock %}
+
+{% block content %}
+    <h1>Elezioni</h1>
+    {% for elezione in elezioni %}
+        <h2>{{ elezione }}</h2>
+        <a href="{% url 'proiezioni_index' elezione.id %}">Proiezioni</a>
+        <a href="{% url 'report_index' elezione.id %}">Report</a>
+        <h4>Rilevazione</h4>
+        <ul>
+            {% for sezione in elezione.sezioni.all %}
+                <li><a href="{% url 'rilevazione_index' sezione.id %}">{{ sezione }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+{% endblock %}

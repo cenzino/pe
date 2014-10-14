@@ -9,14 +9,15 @@ class SezioneInline(admin.TabularInline):
     model = Sezione
     extra = 0
 
+class ListaInline(admin.TabularInline):
+    model = Lista
+    extra = 0
+
+
 class CandidatoInline(admin.TabularInline):
     model = Candidato
 
     list_display = ['cognome', 'nome']
-    extra = 0
-
-class ListaInline(admin.TabularInline):
-    model = Lista
     extra = 0
 
 @admin.register(Elezione)
@@ -27,16 +28,18 @@ class ElezioneAdmin(admin.ModelAdmin):
         }),
     )
     inlines = [
-        SezioneInline,
         CandidatoInline,
-        ListaInline
+        SezioneInline,
+        #ListaInline
     ]
 
 @admin.register(VotiCandidato)
 class VotiCandidatoAdmin(admin.ModelAdmin):
     list_display = ('sezione','candidato','voti')
     readonly_fields=('sezione','candidato',)
+    list_filter = ('candidato',)
     actions = None
+
     def has_add_permission(self, request):
         return False
 
@@ -49,9 +52,10 @@ admin.site.register(VotiLista)
 class VotiCandidatoInline(admin.TabularInline):
     list_display = ('sezione','candidato','voti')
     readonly_fields=('sezione','candidato',)
-    fields = ('candidato', 'voti',)
+    fields = (('candidato', 'voti',),)
     model = VotiCandidato
     extra = 0
+    list_filter = ('candidato',)
 
     actions = None
     def has_add_permission(self, request):
@@ -76,7 +80,20 @@ class VotiListaInline(admin.TabularInline):
 
 @admin.register(Sezione)
 class SezioneAdmin(admin.ModelAdmin):
+    list_filter = ('elezione',)
     inlines = [
         VotiCandidatoInline,
         VotiListaInline
+    ]
+
+@admin.register(Candidato)
+class CandidatoAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {
+            'fields': (('cognome', 'nome'), 'foto')
+        }),
+    )
+    list_filter = ('elezione',)
+    inlines = [
+        ListaInline,
     ]

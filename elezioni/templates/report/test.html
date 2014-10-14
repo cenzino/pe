@@ -1,0 +1,29 @@
+{% extends "proiezioni/base.html" %}
+{% load eletags %}
+
+{% block title %}Proiezioni Candidati{% endblock %}
+{% block custum_style %}
+<style>
+td,th { text-align: center; vertical-align: bottom; }
+
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td {
+vertical-align: middle;
+}
+
+hr { padding: 0; margin: 1px}
+</style>
+{% endblock %}
+
+{% block content %}
+    <ul>
+    {% for s in elezione.test %}
+        <li>
+        <ul>
+        {% for key, value in s.items %}
+            <li><i>{{ key }}</i>: <b>{{ value }}</b></li>
+        {% endfor %}
+        </ul>
+        </li>
+    {% endfor %}
+    </ul>
+{% endblock %}

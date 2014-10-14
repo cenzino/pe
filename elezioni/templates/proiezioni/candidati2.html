@@ -1,0 +1,82 @@
+{% extends "proiezioni/base.html" %}
+{% load eletags %}
+
+{% block title %}Proiezioni Candidati{% endblock %}
+{% block custum_style %}
+<style>
+h3 { padding: 0; margin-top: 2px; padding-bottom: 10px;}
+.list-inline > li {
+    display: inline-block;
+    padding-right: 1px;
+    padding-left: 1px;
+}
+
+.progress-bar-success {
+    background-color: rgba(92,184,92,0.8);
+}
+
+.progress-bar-inf {
+    background-color: rgba(92,184,92,0.9);
+}
+
+.progress-bar-sup {
+    background-color: rgba(92,184,92,1.0);
+}
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+    <h1>Candidati</h1>
+    <table class="table table-bordered">
+        {% for candidato in candidati|dictsortreversed:"voti_totali" %}
+            <tr>
+                <td width="35%">
+                    <h3 class="">
+                    <img src="{{ MEDIA_URL }}{{ candidato.foto|default:"images/default.gif" }}" alt="..." class="img-responsive pull-left" style="width: 30px">
+                    &nbsp;{{ candidato.cognome|upper }}
+                    </h3>
+                    <ul class="list-inline">
+                    {% for lista in candidato.liste.all %}
+                        <li>
+                        <img src="{{ MEDIA_URL }}{{ lista.simbolo|default:"images/default.gif" }}" alt="..." class="img-responsive img-circle" style="width: 40px">
+                        </li>
+                    {% endfor %}
+                    </ul>
+
+                </td>
+                {% with voti_totali_candidato=candidato.voti_totali voti_totali_elezione=elezione.voti_totali_candidati %}
+                    {% with perc=voti_totali_candidato|percentage:voti_totali_elezione %}
+                    <td width="10%">
+                        <h2 class="" style="">{{ perc }}<small>%</small></h2>
+                        {% with forbice=candidato.get_forbice %}
+                        <p class="" style="font-size: 85%">
+                            {{ forbice|forbice_inf_of:perc }}<small class="text-muted">%</small> –
+                            {{ forbice|forbice_sup_of:perc }}<small class="text-muted">%</small>
+                        </p>
+                    </td>
+                    <td width="100%">
+
+                    <div class="progress">
+                      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ forbice|forbice_inf_of:perc }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ forbice|forbice_inf_of:perc }}%;">
+                          {{ perc }}%
+                      </div>
+                      {% if forbice <= 0  %}
+                      <div class="progress-bar progress-bar-success progress-bar-inf" style="width: {{ forbice|floatformat:0 }}%;">
+                         <span class="sr-only">10% Complete (danger)</span>
+                      </div>
+                      <div class="progress-bar progress-bar-success progress-bar-sup" style="width: {{ forbice|floatformat:0 }}%">
+                        <span class="sr-only">10% Complete (danger)</span>
+                      </div>
+                      {% endif %}
+                    </div>
+                    {% endwith %}
+                    {% endwith %}
+                    </td>
+
+                {% endwith %}
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

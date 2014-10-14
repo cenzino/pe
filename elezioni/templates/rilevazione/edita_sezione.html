@@ -1,0 +1,21 @@
+{% extends "rilevazione/base.html" %}
+
+{% block custum_style %}
+<style>
+body {
+    padding-top: 60px;
+    font-family: 'Roboto Condensed', sans-serif;
+}
+</style>
+{% endblock %}
+{% block title %}Edita sezione{% endblock %}
+
+{% block content %}
+<h1>Inserisci i dati della sezione</h1>
+
+<form action="{% url 'edita_sezione' sezione.id %}" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <input type="submit" value="Submit" />
+</form>
+{% endblock %}

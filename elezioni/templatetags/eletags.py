@@ -9,11 +9,33 @@ def percentage(fraction, population):
         return "%.1f" % ((float(fraction) / float(population)) * 100)
     except ValueError:
         return ''
+    except:
+        return ''
+
+@register.filter(name='percentuale')
+def percentuale(fraction, population):
+    try:
+        return "%.1f%%" % ((float(fraction) / float(population)) * 100)
+    except ValueError:
+        return ''
+    except:
+        return "0.0%"
+
+@register.filter(name='rapporto')
+def rapporto(fraction, population):
+    try:
+        return "%f" % ((float(fraction) / float(population)))
+    except ValueError:
+        return ''
 
 @register.filter(name='forbice_sup_of')
 def forbice_sup_of(forbice, valore):
     try:
-        return "%.1f" % (float(valore) + float(forbice))
+        f = float(valore) + float(forbice)
+        if f <= 100:
+            return "%.1f" % abs(float(f))
+        else:
+            return 100
     except ValueError:
         return ''
 
@@ -31,6 +53,6 @@ def forbice_inf_of(forbice, valore):
 @register.filter(name='ap')
 def ap(fraction, population):
     try:
-        return "%i" % round((float(fraction) * float(population))/100)
+        return "%i" % round((float(fraction) * float(population)))
     except ValueError:
         return ''

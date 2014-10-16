@@ -4,6 +4,7 @@
 {% block title %}Proiezioni Candidati{% endblock %}
 {% block custum_style %}
 <style>
+
 .thumbnail .caption {
     padding: 2px;
     color: #333;
@@ -35,30 +36,48 @@
 
 {% block content %}
     <h1>Candidati</h1>
-    <div class="row">
-        {% for candidato in candidati %}
-            <div class="col-sm-6 col-md-2">
-                <div class="thumbnail">
-                    <img src="{{ MEDIA_URL }}{{ candidato.foto|default:"images/default.gif" }}" alt="..." class="img-responsive">
 
-                    <div class="caption text-center"style="background-color: #111; color: #fff; ">
-                        <span class="h4">{{ candidato.cognome|upper }}</span>
-                    </div>
-                    <div class="caption text-center" style="background-color: gold">
-                        {% with voti_totali_candidato=candidato.voti_totali voti_totali_elezione=elezione.voti_totali_candidati %}
-                            {% with perc=voti_totali_candidato|percentage:voti_totali_elezione %}
-                            <h1 class="" style="">{{ perc }}<small>%</small></h1>
-                            {% with forbice=candidato.get_forbice %}
-                            <p class="" style="font-size: 85%">
-                                {{ forbice|forbice_inf_of:perc }}<small class="text-muted">%</small> –
-                                {{ forbice|forbice_sup_of:perc }}<small class="text-muted">%</small>
-                            </p>
+    Copertura: {{ elezione.copertura|percentage:1 }}%
+    {{ elezione.copertura_simulata }}
+    <div class="container">
+        <div class="row">
+        <div class="col-md-8">
+            {% for candidato in candidati %}
+
+                <div class="col-sm-2 col-md-3">
+                    <div class="thumbnail">
+                        <img src="{{ MEDIA_URL }}{{ candidato.foto|default:"images/default.gif" }}" alt="..." class="img-responsive">
+
+                        <div class="caption text-center"style="background-color: #111; color: #fff; ">
+                            <span class="h5">{{ candidato.cognome|upper }}</span>
+                        </div>
+                        <div class="caption text-center" style="background-color: gold">
+                            {% with voti_totali_candidato=candidato.voti_totali.voti_mod voti_totali_elezione=elezione.voti_totali_candidati.voti_mod %}
+                                {% with perc=voti_totali_candidato|percentage:voti_totali_elezione %}
+                                <h1 class="" style="">{{ perc }}<small>%</small></h1>
+                                {% with forbice=candidato.get_forbice %}
+                                <p class="" style="font-size: 85%">
+                                    {{ forbice|forbice_inf_of:perc }}<small class="text-muted">%</small> –
+                                    {{ forbice|forbice_sup_of:perc }}<small class="text-muted">%</small>
+                                </p>
+                                {% endwith %}
+                                {% endwith %}
                             {% endwith %}
-                            {% endwith %}
-                        {% endwith %}
+                        </div>
                     </div>
                 </div>
+            {% endfor %}
+        </div>
+        <div class="col-md-4" style="background-color: lightgreen; border:1px solid #ddd; padding:4px">
+            <div class="container">
+            <div class="row">
+            {% for s in sponsor %}
+                    <img class="media-object" data-src="holder.js/128x64/sky/text:{{ s }}" alt="64x64" style="width: 64px; height: 64px; margin-bottom: 2px">
+
+            {% endfor %}
             </div>
-        {% endfor %}
+            </div>
+        </div>
     </div>
+
 {% endblock %}

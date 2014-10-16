@@ -16,15 +16,15 @@ class ListaInline(admin.TabularInline):
 
 class CandidatoInline(admin.TabularInline):
     model = Candidato
-
-    list_display = ['cognome', 'nome']
+    fields = ('cognome', 'nome', 'foto')
+    #list_display = ('cognome', 'nome')
     extra = 0
 
 @admin.register(Elezione)
 class ElezioneAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': (('titolo', 'descrizione'), 'chiusa')
+            'fields': (('titolo', 'descrizione'), 'chiusa', 'aventi_diritto', 'copertura_simulata')
         }),
     )
     inlines = [
@@ -32,6 +32,11 @@ class ElezioneAdmin(admin.ModelAdmin):
         SezioneInline,
         #ListaInline
     ]
+
+    class Media:
+        css = {
+            "all": ("admin.css",)
+        }
 
 @admin.register(VotiCandidato)
 class VotiCandidatoAdmin(admin.ModelAdmin):
@@ -85,6 +90,12 @@ class SezioneAdmin(admin.ModelAdmin):
         VotiCandidatoInline,
         VotiListaInline
     ]
+
+    class Media:
+        css = {
+            "all": ("admin.css",)
+        }
+
 
 @admin.register(Candidato)
 class CandidatoAdmin(admin.ModelAdmin):

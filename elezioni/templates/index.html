@@ -4,15 +4,26 @@
 
 {% block content %}
     <h1>Elezioni</h1>
+    <table class="table table-bordered table-hover">
     {% for elezione in elezioni %}
-        <h2>{{ elezione }}</h2>
-        <a href="{% url 'proiezioni_index' elezione.id %}">Proiezioni</a>
-        <a href="{% url 'report_index' elezione.id %}">Report</a>
-        <h4>Rilevazione</h4>
-        <ul>
-            {% for sezione in elezione.sezioni.all %}
-                <li><a href="{% url 'rilevazione_index' sezione.id %}">{{ sezione }}</a></li>
-            {% endfor %}
-        </ul>
+    <tr>
+        <td><h4>{{ elezione }}</h4></td>
+        <td>
+            <a class="btn btn-default" href="{% url 'proiezioni_index' elezione.id %}">Proiezioni</a>
+            <a class="btn btn-default" href="{% url 'report_index' elezione.id %}">Report</a>
+
+            <div class="btn-group">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                Rilevazione <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                {% for sezione in elezione.sezioni.all %}
+                    <li><a href="{% url 'rilevazione_index' sezione.id %}">{{ sezione }}</a></li>
+                {% endfor %}
+              </ul>
+            </div>
+        </td>
+    </tr>
     {% endfor %}
+    </table>
 {% endblock %}

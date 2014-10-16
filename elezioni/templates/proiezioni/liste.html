@@ -69,16 +69,16 @@ h4 {
 
 {% block content %}
 <table class="table table-bordered">
-    {% with  voti_totali_elezione=elezione.voti_totali_liste %}
-    {% for candidato in candidati|dictsortreversed:"voti_totali_liste" %}
+    {% with  voti_totali_elezione=elezione.voti_totali_liste.voti_mod %}
+    {% for candidato in candidati|dictsortreversed:"voti_totali_liste.voti_mod" %}
     <tr class="" style="background-color: #eee">
-        {% with perc_liste=candidato.voti_totali_liste|percentage:voti_totali_elezione %}
+        {% with perc_liste=candidato.voti_totali_liste.voti_mod|percentage:voti_totali_elezione %}
         <td><h4 style="padding: 0; margin: 0; font-weight: 400;">{{ candidato|upper }} <span class="pull-right" style="font-size: 120%; font-weight: bold">{{ perc_liste }}%</span></h4></td>
         <td>
 
             <div class="progress">
               <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ perc_liste }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ perc_liste }}%;">
-                  {{ perc_liste }}% <em>({{ candidato.voti_totali_liste }} voti)</em>
+                  {{ perc_liste }}% <em>({{ candidato.voti_totali_liste.voti_mod }} voti)</em>
               </div>
             </div>
         {% endwith %}
@@ -88,8 +88,8 @@ h4 {
         <td></td>
         <td>
             <ul class="media-list">
-            {% for lista in candidato.liste.all|dictsortreversed:"voti_totali" %}
-                {% with voti_totali_lista=lista.voti_totali %}
+            {% for lista in candidato.liste.all|dictsortreversed:"voti_totali.voti_mod" %}
+                {% with voti_totali_lista=lista.voti_totali.voti_mod %}
                 {% with perc=voti_totali_lista|percentage:voti_totali_elezione %}
 
                   <li class="media">

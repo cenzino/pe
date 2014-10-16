@@ -46,7 +46,7 @@ h3 { padding: 0; margin-top: 2px; padding-bottom: 10px;}
                     </ul>
 
                 </td>
-                {% with voti_totali_candidato=candidato.voti_totali voti_totali_elezione=elezione.voti_totali_candidati %}
+                {% with voti_totali_candidato=candidato.voti_totali.voti_mod voti_totali_elezione=elezione.voti_totali_candidati.voti_mod %}
                     {% with perc=voti_totali_candidato|percentage:voti_totali_elezione %}
                     <td width="10%">
                         <h2 class="" style="">{{ perc }}<small>%</small></h2>

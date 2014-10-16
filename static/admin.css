@@ -1,0 +1,12 @@
+.inline-group .tabular tr.has_original td {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.inline-group .tabular tr td.original * {
+    display: none;
+}
+
+p.file-upload br {
+    display: none;
+}

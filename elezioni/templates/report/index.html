@@ -1,4 +1,4 @@
-{% extends "proiezioni/base.html" %}
+{% extends "report/base.html" %}
 {% load eletags %}
 
 {% block title %}Proiezioni Candidati{% endblock %}
@@ -10,96 +10,66 @@ td,th { text-align: center; vertical-align: bottom; }
 vertical-align: middle;
 }
 
+.table>tfoot>tr {
+    background-color: #fff;
+    border-top-width: 2px;
+
+}
+.table>tfoot>tr>td,
+.table>tfoot>tr>th {
+    background-color: #fff;
+    border-top-width: 2px;
+
+}
+        td>p {
+            padding: 0;
+            margin: 0;
+            /* display: inline; */
+        }
+        .percentuale {
+            font-weight: normal;
+        }
+        .numero {
+            font-style: italic;
+            font-size: x-small;
+            color: #666;
+        }
+        .totali,
+        .totali .percentuale {
+            font-weight: bold;
+            font-size: 14px;
+        }
+
 hr { padding: 0; margin: 1px}
 </style>
 {% endblock %}
 
 {% block content %}
-    <h1>Candidati</h1>
-    <table class="table table-hover">
-        {% for sezione in elezione.sezioni.all %}
-            {% if forloop.first %}
-            <thead>
-                <tr>
-                    <th colspan="4">Sezioni</th>
-                    <th colspan="{{ sezione.voticandidato_set.count }}">Candidati</th>
-                </tr>
-                <tr class="color-bg-base">
-                    <th>Nr</th>
-                    <th>Iscritti</th>
-                    <th>Votanti</th>
-                    <th>Scrutinati</th>
-                    {% for vc in sezione.voticandidato_set.all %}
-                        <th>{{ vc.candidato.cognome|upper }}</th>
-                    {% endfor %}
-                </tr>
-            </thead>
-            <tbody>
-            {% endif %}
-
-            <tr>
-                <td>{{ sezione.numero }}</td>
-                <td>{{ sezione.aventi_diritto }}</td>
-                <td>{{ sezione.votanti }}</td>
-                <td>
-                    {{ sezione.totale_voti_scrutinati|percentage:sezione.votanti }}<small class="text-muted">%</small>
-                    <hr>
-                    <small class="text-muted">{{ sezione.totale_voti_scrutinati }}</small>
-                </td>
-                {% for x in sezione.voticandidato_set.all %}
-                    <td>
-                        <b>{{ x.voti|percentage:sezione.totale_voti_scrutinati }}</b><small class="text-muted">%</small>
-                        <hr>
-                        <small class="text-muted">{{ x.voti }}</small>
-                    </td>
-                {% endfor %}
-            </tr>
-            {% if forloop.last %}
-                </tbody>
-                <tfoot class="color-base">
-                    <th colspan="1">Totale</th>
-                    <th><strong style="font-size: x-large">{{ elezione.totale_iscritti }}</strong></th>
-                    <th>
-                        <strong style="font-size: x-large">{{ elezione.totale_votanti|percentage:elezione.totale_iscritti }}</strong><small class="text-muted">%</small>
-                        <hr>
-                        <small class="text-muted">{{ elezione.totale_votanti }}</small>
-                    </th>
-                    <td>
-                        <strong style="font-size: x-large">{{ elezione.voti_totali_candidati|percentage:elezione.totale_votanti }}</strong><small class="text-muted">%</small>
-                        <hr>
-                        <small class="text-muted">{{ elezione.voti_totali_candidati }}</small>
-                    </td>
-                    {% for vc in sezione.voticandidato_set.all %}
-                        <td>
-                            <strong style="font-size: x-large">{{  vc.candidato.voti_totali|percentage:elezione.voti_totali_candidati }}</strong><small class="text-muted">%</small>
-                            <hr>
-                            <small class="text-muted">{{ vc.candidato.voti_totali }}</small>
-                        </td>
-                    {% endfor %}
-                </tfoot>
-            {% endif %}
-        {% endfor %}
-    </table>
-
-    Media: {{ elezione.media|floatformat:1 }}%
-
-{% with m=elezione.media %}
+    <h1>Candidati <small>Dati grezzi</small></h1>
+    <p>Copertura: {{ elezione.c_get_copertura_campione }}%</p>
     <br>
-    <table class="table table-hover">
+    {% include "includes/_tabella_report.html" with risultati=risultati %}
+    {%comment %}
+    <h1>Candidati <small>Dati grezzi</small></h1>
+    <table class="table table-hover table-condensed table-bordered">
         {% for sezione in elezione.sezioni.all %}
             {% if forloop.first %}
             <thead>
                 <tr>
-                    <th colspan="4">Sezioni</th>
+                    <th colspan="4">Sezione</th>
+                    <th colspan="3">Schede</th>
                     <th colspan="{{ sezione.voticandidato_set.count }}">Candidati</th>
                 </tr>
                 <tr class="color-bg-base">
                     <th>Nr</th>
                     <th>Iscritti</th>
                     <th>Votanti</th>
-                    <th>Scrutinati</th>
+                    <th>Copertura</th>
+                    <th>Valide</th>
+                    <th>Bianche</th>
+                    <th>Nulle</th>
                     {% for vc in sezione.voticandidato_set.all %}
-                        <th>{{ vc.candidato.cognome|upper }}</th>
+                        <th><small>{{ vc.candidato.cognome|upper }}</small></th>
                     {% endfor %}
                 </tr>
             </thead>
@@ -108,26 +78,126 @@ hr { padding: 0; margin: 1px}
 
             <tr>
                 <td>{{ sezione.numero }}</td>
-                <td>{{ sezione.aventi_diritto }}</td>
+                <td>{{ sezione.iscritti }}</td>
                 <td>{{ sezione.votanti }}</td>
                 <td>
-                    {{ sezione.totale_voti_scrutinati|percentage:sezione.votanti }}<small class="text-muted">%</small>
-                    <small class="text-muted">%</small>
-                    <hr>
-                    <small class="text-muted">{{ sezione.totale_voti_scrutinati }} – {{ sezione.votanti|ap:m }}</small>
+                    {% include "includes/_voti_in_tabella.html" with parziale=sezione.totale_schede_scrutinate totale=sezione.votanti %}
+                </td>
+                <td>
+                    {% include "includes/_voti_in_tabella.html" with parziale=sezione.totale_voti_scrutinati.voti totale=sezione.totale_schede_scrutinate %}
+                </td>
+                <td>
+                    {% include "includes/_voti_in_tabella.html" with parziale=sezione.schede_bianche totale=sezione.totale_schede_scrutinate %}
+                </td>
+                <td>
+                    {% include "includes/_voti_in_tabella.html" with parziale=sezione.schede_nulle totale=sezione.totale_schede_scrutinate %}
                 </td>
                 {% for x in sezione.voticandidato_set.all %}
                     <td>
-                        <b>{{ x.voti|percentage:sezione.totale_voti_scrutinati }}</b><small class="text-muted">%</small>
-                        <hr>
-                        <small class="text-muted">{{ x.voti }}</small>
+                        {% include "includes/_voti_in_tabella.html" with parziale=x.voti totale=sezione.totale_voti_scrutinati.voti %}
                     </td>
                 {% endfor %}
             </tr>
             {% if forloop.last %}
                 </tbody>
                 <tfoot class="color-base">
-                    <th colspan="1">Totale</th>
+                    <th colspan="1">&nbsp;</th>
+                    <th><strong style="">{{ elezione.totale_iscritti }}</strong></th>
+                    <th>
+                        {% include "includes/_voti_in_tabella.html" with parziale=elezione.totale_votanti totale=elezione.totale_iscritti %}
+                    </th>
+                    <td>
+                        {% include "includes/_voti_in_tabella.html" with parziale=elezione.totale_schede_scrutinate totale=elezione.totale_votanti %}
+                    </td>
+                    <td>
+                        {% include "includes/_voti_in_tabella.html" with parziale=elezione.voti_totali_candidati.voti totale=elezione.totale_votanti %}
+                    </td>
+                    <td>
+                        {% include "includes/_voti_in_tabella.html" with parziale=elezione.totale_schede.bianche  totale=elezione.totale_votanti %}
+                    </td>
+                    <td>
+                        {% include "includes/_voti_in_tabella.html" with parziale=elezione.totale_schede.nulle totale=elezione.totale_votanti %}
+                    </td>
+                    {% for vc in sezione.voticandidato_set.all %}
+                        <td>
+                            {% include "includes/_voti_in_tabella.html" with parziale=vc.candidato.voti_totali.voti totale=elezione.voti_totali_candidati.voti %}
+                        </td>
+                    {% endfor %}
+                </tfoot>
+            {% endif %}
+        {% endfor %}
+    </table>
+
+{% with copertura=elezione.copertura %}
+    <br>
+Copertura: {{ copertura|percentage:1 }}% ({{ elezione.copertura }})
+    <h1>Candidati <small>Dati ponderati</small></h1>
+    <table class="table table-hover table-condensed table-bordered">
+        {% for sezione in elezione.sezioni.all %}
+            {% if forloop.first %}
+            <thead>
+                <tr>
+                    <th colspan="4">Sezione</th>
+                    <th colspan="3">Schede</th>
+                    <th colspan="{{ sezione.voticandidato_set.count }}">Candidati</th>
+                </tr>
+                <tr class="color-bg-base">
+                    <th>Nr</th>
+                    <th>Iscritti</th>
+                    <th>Votanti</th>
+                    <th>Copertura</th>
+                    <th>Valide</th>
+                    <th>Bianche</th>
+                    <th>Nulle</th>
+                    {% for vc in sezione.voticandidato_set.all %}
+                        <th><small>{{ vc.candidato.cognome|upper }}</small></th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% endif %}
+
+            <tr>
+                <td>{{ sezione.numero }}</td>
+                <td>{{ sezione.iscritti }}</td>
+                <td>{{ sezione.votanti }}</td>
+                <td>
+                    {# copertura #}
+                    {{ sezione.totale_voti_scrutinati.voti_mod|percentage:sezione.votanti }}<small class="text-muted">%</small>
+                    <hr>
+                    <small class="text-muted">{{ sezione.get_copertura_mod }}</small>
+                </td>
+                <td>
+                    {#  Valide #}
+                    {{ sezione.get_schede_valide_mod|percentage:sezione.totale_voti_scrutinati.voti_mod }}<small class="text-muted">%</small>
+                    <hr>
+                    <small class="text-muted">{{ sezione.get_schede_valide_mod }}</small>
+                </td>
+                <td>
+                    {#  Bianche #}
+                    {{ sezione.get_schede_bianche_mod|percentage:sezione.totale_voti_scrutinati.voti_mod }}<small class="text-muted">%</small>
+                    <hr>
+                    <small class="text-muted">{{ sezione.get_schede_bianche_mod }}</small>
+                </td>
+                <td>
+                    {#  Nulle #}
+                    {{ sezione.get_schede_nulle_mod|percentage:sezione.totale_voti_scrutinati.voti_mod }}<small class="text-muted">%</small>
+                    <hr>
+                    <small class="text-muted">{{ sezione.get_schede_nulle_mod }}</small>
+                </td>
+
+                {% for x in sezione.voticandidato_set.all %}
+                    <td>
+                        <b>{{ x.voti_mod|percentage:sezione.totale_voti_scrutinati.voti_mod }}</b><small class="text-muted">%</small>
+                        <hr>
+                        <small class="text-muted">{{ x.voti_mod }}</small>
+                    </td>
+                {% endfor %}
+            </tr>
+            {% if forloop.last %}
+                </tbody>
+                <tfoot class="color-base">
+                    <th colspan="1">&nbsp;</th>
                     <th><strong style="font-size: x-large">{{ elezione.totale_iscritti }}</strong></th>
                     <th>
                         <strong style="font-size: x-large">{{ elezione.totale_votanti|percentage:elezione.totale_iscritti }}</strong><small class="text-muted">%</small>
@@ -135,20 +205,37 @@ hr { padding: 0; margin: 1px}
                         <small class="text-muted">{{ elezione.totale_votanti }}</small>
                     </th>
                     <td>
-                        <strong style="font-size: x-large">{{ elezione.voti_totali_candidati|percentage:elezione.totale_votanti }}</strong><small class="text-muted">%</small>
+                        <strong style="font-size: x-large">{{ elezione.voti_totali_candidati.voti_mod|percentage:elezione.totale_votanti }}</strong><small class="text-muted">%</small>
                         <hr>
-                        <small class="text-muted">{{ elezione.voti_totali_candidati }}</small>
+                        <small class="text-muted">{{ elezione.voti_totali_candidati.voti_mod }}</small>
                     </td>
+                    <th>
+                        <strong style="font-size: x-large">{{ elezione.totale_votanti|percentage:elezione.totale_iscritti }}</strong><small class="text-muted">%</small>
+                        <hr>
+                        <small class="text-muted">{{ elezione.totale_votanti }}</small>
+                    </th>
+                    <th>
+                        <strong style="font-size: x-large">{{ elezione.totale_votanti|percentage:elezione.totale_iscritti }}</strong><small class="text-muted">%</small>
+                        <hr>
+                        <small class="text-muted">{{ elezione.totale_votanti }}</small>
+                    </th>
+                    <th>
+                        <strong style="font-size: x-large">{{ elezione.totale_votanti|percentage:elezione.totale_iscritti }}</strong><small class="text-muted">%</small>
+                        <hr>
+                        <small class="text-muted">{{ elezione.totale_votanti }}</small>
+                    </th>
                     {% for vc in sezione.voticandidato_set.all %}
                         <td>
-                            <strong style="font-size: x-large">{{  vc.candidato.voti_totali|percentage:elezione.voti_totali_candidati }}</strong><small class="text-muted">%</small>
+                            <strong style="font-size: x-large">{{  vc.candidato.voti_totali.voti_mod|percentage:elezione.voti_totali_candidati.voti_mod }}</strong><small class="text-muted">%</small>
                             <hr>
-                            <small class="text-muted">{{ vc.candidato.voti_totali }}</small>
+                            <small class="text-muted">{{ vc.candidato.voti_totali.voti_mod }}</small>
                         </td>
                     {% endfor %}
                 </tfoot>
             {% endif %}
         {% endfor %}
     </table>
+
 {% endwith %}
+{% endcomment %}
 {% endblock %}

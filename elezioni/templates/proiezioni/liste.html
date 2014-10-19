@@ -73,7 +73,7 @@ h4 {
     {% for candidato in candidati|dictsortreversed:"voti_totali_liste.voti_mod" %}
     <tr class="" style="background-color: #eee">
         {% with perc_liste=candidato.voti_totali_liste.voti_mod|percentage:voti_totali_elezione %}
-        <td><h4 style="padding: 0; margin: 0; font-weight: 400;">{{ candidato|upper }} <span class="pull-right" style="font-size: 120%; font-weight: bold">{{ perc_liste }}%</span></h4></td>
+        <td><h4 style="padding: 0; margin: 0; font-weight: 400;">{{ candidato.cognome|upper }} <span class="pull-right" style="font-size: 120%; font-weight: bold">{{ perc_liste }}%</span></h4></td>
         <td>
 
             <div class="progress">

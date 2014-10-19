@@ -1,0 +1,20 @@
+{% load eletags %}
+{% if totale.grezzi or totale.ponderati %}
+<div class="grezzi">
+    <span class="percentuale">{{ parziale.grezzi|percentage:totale.grezzi }}<small>%</small></span>
+    <span class="numero">{{ parziale.grezzi }}</span>
+</div>
+<div class="ponderati">
+    <span class="percentuale">{{ parziale.ponderati|percentage:totale.ponderati }}<small>%</small></span>
+    <span class="numero">{{ parziale.ponderati }}</span>
+</div>
+{% else %}
+<div class="grezzi">
+    <span class="percentuale">{{ parziale.grezzi|percentage:totale }}<small>%</small></span>
+    <span class="numero">{{ parziale.grezzi }}</span>
+</div>
+<div class="ponderati">
+    <span class="percentuale">{{ parziale.ponderati|percentage:totale }}<small>%</small></span>
+    <span class="numero">{{ parziale.ponderati }}</span>
+</div>
+{% endif %}

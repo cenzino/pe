@@ -1,0 +1,97 @@
+{% load static eletags %}
+<html>
+<head>
+    <link href="{% static "bootstrap/dist/css/bootstrap.min.css" %}" rel="stylesheet">
+    <style>
+        * {
+            font-size: 12px;
+        }
+        body {
+            font-family: "Helvetica Neue", sans-serif;
+        }
+
+        td {
+            padding: 2px 6px;
+            text-align: center;
+        }
+        td>p {
+            padding: 0;
+            margin: 0;
+            /* display: inline; */
+        }
+        .percentuale {
+            font-weight: normal;
+        }
+        .numero {
+            font-style: italic;
+            font-size: x-small;
+            color: #666;
+        }
+        .totali,
+        .totali .percentuale {
+            font-weight: bold;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>{{ elezione }}</h1>
+<p>Copertura: {{ elezione.c_get_copertura_campione }}%</p>
+
+{% comment %}
+<br>
+<table border="1px">
+    <tr>
+        <td colspan="3">Sezione</td>
+        <td colspan="4">Schede</td>
+        <td colspan="{{ risultati.candidati.all.count }}">Candidati</td>
+    </tr>
+    <tr>
+        <td>Nr</td>
+        <td>Iscritti</td>
+        <td>Votanti</td>
+        <td>Scrutinate</td>
+        <td>Valide</td>
+        <td>Nulle</td>
+        <td>Bianche</td>
+        {% for candidato in risultati.candidati.all %}
+            <td>{{ candidato }}</td>
+        {% endfor %}
+    </tr>
+{% for sezione in risultati.sezioni %}
+    <tr>
+        <td>{{ sezione.numero }}</td>
+        <td>{{ sezione.iscritti }}</td>
+        <td>{{ sezione.votanti }}</td>
+        <td>
+            {% include "includes/_voti.html" with parziale=sezione.schede.scrutinate totale=sezione.votanti %}
+        </td>
+        <td>
+            {% include "includes/_voti.html" with parziale=sezione.schede.valide totale=sezione.schede.scrutinate %}
+        </td>
+        <td>
+            {% include "includes/_voti.html" with parziale=sezione.schede.nulle totale=sezione.schede.scrutinate %}
+        </td>
+        <td>
+            {% include "includes/_voti.html" with parziale=sezione.schede.bianche totale=sezione.schede.scrutinate %}
+        </td>
+        {% for e in sezione.elementi %}
+            <td>
+                {% include "includes/_voti.html" with parziale=e.voto totale=sezione.schede.valide %}
+            </td>
+        {% endfor %}
+    </tr>
+{% endfor %}
+</table>
+{% endcomment %}
+<br>
+{% include "includes/_tabella_report.html" with risultati=risultati %}
+
+<br>
+{% include "includes/_tabella_report.html" with risultati=risultati2 %}
+{% comment %}
+{% include "includes/_tabella_report.html" with risultati=elezione.c_get_risultati %}
+{% endcomment %}
+</body>
+</html>

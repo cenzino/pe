@@ -1,0 +1,41 @@
+{% load eletags %}
+
+<table class="table table-hover table-condensed table-bordered">
+    <thead>
+        <tr>
+            <td colspan="3">Sezione</td>
+            <td colspan="4">Schede</td>
+            <td colspan="{{ risultati.totali.elementi.count }}">Candidati</td>
+
+        </tr>
+        <tr>
+            <td>Nr</td>
+            <td>Iscritti</td>
+            <td>Votanti</td>
+            <td>Scrutinate</td>
+            <td>Valide</td>
+            <td>Nulle</td>
+            <td>Bianche</td>
+            {% for s in risultati.totali.elementi %}
+                <td class="small">{{ s|upper|truncatechars:20}}</td>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="background-color: #eee; font-weight: bold">
+            {% include "includes/_tabella_report_riga_z.html" with sezione=risultati.totali %}
+        </tr>
+        {% for sezione in risultati.sezioni %}
+
+            <tr>
+                {% include "includes/_tabella_report_riga_z.html" with sezione=sezione %}
+            </tr>
+
+        {% endfor %}
+        <tr style="background-color: #eee; font-weight: bold">
+            {% include "includes/_tabella_report_riga_z.html" with sezione=risultati.totali %}
+        </tr>
+    </tbody>
+</table>
+<br>
+&nbsp;

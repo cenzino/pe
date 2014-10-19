@@ -28,23 +28,25 @@
         <td>{{ sezione.iscritti }}</td>
         <td>{{ sezione.votanti }}</td>
         <td>
-            {% include "includes/_voti.html" with parziale=sezione.schede_scrutinate totale=sezione.votanti %}
+            {% include "includes/_voti3.html" with parziale=sezione.schede_scrutinate totale=sezione.votanti %}
         </td>
         <td>
-            {% include "includes/_voti.html" with parziale=sezione.schede_valide totale=sezione.schede_scrutinate %}
+            {% include "includes/_voti3.html" with parziale=sezione.schede_valide totale=sezione.schede_scrutinate %}
         </td>
         <td>
-            {% include "includes/_voti.html" with parziale=sezione.schede_nulle totale=sezione.schede_scrutinate %}
+            {% include "includes/_voti3.html" with parziale=sezione.schede_nulle totale=sezione.schede_scrutinate %}
         </td>
         <td>
-            {% include "includes/_voti.html" with parziale=sezione.schede_bianche totale=sezione.schede_scrutinate %}
+            {% include "includes/_voti3.html" with parziale=sezione.schede_bianche totale=sezione.schede_scrutinate %}
         </td>
         {% for elemento in sezione.elementi %}
             <td>
-                {% include "includes/_voti.html" with parziale=elemento.voti totale=sezione.schede_valide %}
+                {% include "includes/_voti3.html" with parziale=elemento.voti totale=sezione.schede_valide %}
             </td>
         {% endfor %}
     </tr>
 {% endfor %}
     </tbody>
 </table>
+<br>
+&nbsp;

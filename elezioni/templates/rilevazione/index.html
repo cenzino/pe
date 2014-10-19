@@ -75,7 +75,7 @@ padding-left: 4px;
                     <img class="img-responsive" src="{{ MEDIA_URL }}images/default.gif" alt=""/>
                 {% endif %}
             </div>
-            <div class="col-xs-3 col-sm-8 col-md-8 col-lg-8"><h5>{{ v.lista.nome|upper }}<p class="text-muted text-nowrap" style="font-size: small; font-weight: 400; margin-top:2px">{{ v.lista.candidato|upper }}</p>
+            <div class="col-xs-3 col-sm-8 col-md-8 col-lg-8"><h5>{{ v.lista.nome|upper }}<p class="text-muted text-nowrap" style="font-size: small; font-weight: 400; margin-top:2px">{{ v.lista.candidato.cognome|upper }}</p>
 
             </h5></div>
             <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 text-right"><span class="voti">{{ v.voti }}</span></div>

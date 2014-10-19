@@ -75,10 +75,31 @@ def edita_sezione(request, sezione_id):
     return render(request, 'rilevazione/edita_sezione.html', { 'sezione': sezione, 'form': form})
 
 
-def report(request, elezione_id):
+def report_candidati_dati_grezzi(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
     #elezione.c_aggiorna()
     risultati = elezione.c_get_risultati()
+    return render(request, 'report/index.html', { 'elezione': elezione, 'risultati': risultati })
+
+def report_candidati_dati_ponderati(request, elezione_id):
+    elezione = get_object_or_404(Elezione, pk=elezione_id)
+    #elezione.c_aggiorna()
+    elezione.pondera(candidati=True)
+    risultati = elezione.c_get_risultati_candidati_full()
+    return render(request, 'report/index.html', { 'elezione': elezione, 'risultati': risultati })
+
+def report_liste_dati_grezzi(request, elezione_id):
+    elezione = get_object_or_404(Elezione, pk=elezione_id)
+    #elezione.c_aggiorna()
+    risultati = elezione.c_get_risultati_liste()
+    return render(request, 'report/index.html', { 'elezione': elezione, 'risultati': risultati })
+
+def report_liste_dati_ponderati(request, elezione_id):
+    elezione = get_object_or_404(Elezione, pk=elezione_id)
+    #elezione.c_aggiorna()
+    elezione.crea_proiezione()
+    elezione.pondera(liste=True)
+    risultati = elezione.c_get_risultati_liste_full()
     return render(request, 'report/index.html', { 'elezione': elezione, 'risultati': risultati })
 
 def report_liste(request, elezione_id):
@@ -93,62 +114,41 @@ def data(request, elezione_id):
     return HttpResponse(data, content_type='application/json')
     #return HttpResponse(simplejson.dumps(shipments, ensure_ascii=False, default=json_formatter), mimetype='application/json')
 
+#--------------
 def report_test(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
+    elezione.pondera(candidati=True)
     #elezione.aggiorna()
     #elezione.c_aggiorna()
     risultati = {}
     sezioni = []
-    """
-    for sezione in elezione.sezioni.all():
-        s = {
-            'numero': sezione.numero,
-            'iscritti': sezione.iscritti,
-            'votanti': sezione.votanti,
-            'schede_valide': sezione.c_get_schede_valide(),
-            'schede_bianche': sezione.schede_bianche,
-            'schede_nulle': sezione.schede_nulle
-        }
-        s['schede_scrutinate'] = s['schede_valide'] + s['schede_nulle'] + s['schede_bianche']
-        elementi = []
-        for voti in sezione.voticandidato_set.all():
-            #print voti.voti
-            elemento = {
-                'voti': voti.voti,
-            }
-            elementi.append(elemento)
-        s['elementi'] = elementi
-        sezioni.append(s)
-    risultati['nomi'] = elezione.candidati.values()
-    risultati['sezioni'] = sezioni
 
-    risultati2 = {}
-    sezioni2 = []
-    """
-    """
-    for sezione in elezione.sezioni.all():
-        s = {
-            'numero': sezione.numero,
-            'iscritti': sezione.iscritti,
-            'votanti': sezione.votanti,
-            'schede_valide': sezione.c_get_schede_valide_mod(),
-            'schede_bianche': sezione.schede_bianche_mod,
-            'schede_nulle': sezione.schede_nulle_mod
-        }
-        s['schede_scrutinate'] = s['schede_valide'] + s['schede_nulle'] + s['schede_bianche']
-        #s['schede']['scrutinate'] = elezione.c_get_copertura_campione()*sezione.votanti
-        elementi = []
-        for voti in sezione.voticandidato_set.all():
-            #print voti.voti
-            elemento = {
-                'voti': voti.voti_mod,
-            }
-            elementi.append(elemento)
-        s['elementi'] = elementi
-        sezioni2.append(s)
-    risultati2['nomi'] = elezione.candidati.values()
-    risultati2['sezioni'] = sezioni2
-    """
     risultati = elezione.c_get_risultati()
     risultati2 = elezione.c_get_risultati('ponderati')
     return render(request, 'report/test.html', { 'elezione': elezione, 'risultati': risultati, 'risultati2': risultati2 })
+#---------------
+
+def report_test_liste(request, elezione_id):
+    elezione = get_object_or_404(Elezione, pk=elezione_id)
+    #elezione.aggiorna()
+    #elezione.c_aggiorna()
+    elezione.pondera(liste=True)
+    risultati = elezione.c_get_risultati_liste()
+    risultati2 = elezione.c_get_risultati_liste('ponderati')
+    return render(request, 'report/test.html', { 'elezione': elezione, 'risultati': risultati, 'risultati2': risultati2 })
+
+
+def report_test3(request, elezione_id):
+    elezione = get_object_or_404(Elezione, pk=elezione_id)
+    #elezione.aggiorna()
+    #elezione.c_aggiorna()
+    elezione.pondera()
+    risultati = elezione.c_get_risultati_candidati_full()
+    data = risultati
+
+    return render(request, 'report/test3.html', { 'risultati': risultati })
+
+def z(request, elezione_id):
+    elezione = get_object_or_404(Elezione.objects.select_related('sezioni'), pk=elezione_id)
+
+    return render(request, 'report/z.html', { 'elezione': elezione, 'risultati': elezione.get_risultati(Candidato) })

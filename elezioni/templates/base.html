@@ -10,15 +10,19 @@
     <link rel="icon" href="../../favicon.ico">
 
     <title>{% block title %}Elezioni{% endblock %}</title>
-
+  <!--
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
     <!-- Bootstrap core CSS -->
     <link href="{% static "bootstrap/dist/css/bootstrap.min.css" %}" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300,400italic,500,500italic,700italic,300italic|Roboto+Condensed:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>
+
     <link href="{% static "style.css" %}" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <!--
   <script src="https://cdnjs.cloudflare.com/ajax/libs/holder/2.4.0/holder.js"></script>
+  -->
     {% block custum_style %}{% endblock %}
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -66,8 +70,10 @@
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
-
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %}"></script>
+    <!--
     <script src="http://imsky.github.com/holder/holder.js"></script>
+    -->
   </body>
 </html>

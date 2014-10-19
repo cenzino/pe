@@ -8,16 +8,16 @@ def percentage(fraction, population):
     try:
         return "%.1f" % ((float(fraction) / float(population)) * 100)
     except ValueError:
-        return ''
+        return '0.0'
     except:
-        return ''
+        return '0.0'
 
 @register.filter(name='percentuale')
 def percentuale(fraction, population):
     try:
         return "%.1f%%" % ((float(fraction) / float(population)) * 100)
     except ValueError:
-        return ''
+        return '0.0%'
     except:
         return "0.0%"
 

@@ -36,6 +36,7 @@ td,th { text-align: center; vertical-align: bottom; }
             font-weight: normal;
             color: #000;
             font-size: 16px;
+
         }
         .numero {
             font-weight: 100;
@@ -47,8 +48,9 @@ td,th { text-align: center; vertical-align: bottom; }
 {% endblock %}
 
 {% block content %}
-    {% include "includes/_tabella_report_z.html" with risultati=risultati %}
-    {% include "includes/_tabella_report_z.html" with risultati=risultati2 %}
+
+    {% include "includes/_tabella_report_z2.html" with risultati=risultati2 %}
+
 {% endblock %}
 
 {% block footer_scripts %}{% endblock %}

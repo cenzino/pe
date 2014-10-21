@@ -99,3 +99,42 @@ PROJECT_PATH = os.path.abspath(PROJECT_PATH)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media') # Absolute path to the media directory
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+            'datefmt' : "%d/%b/%Y %H:%M:%S"
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+
+        #'file': {
+        #    'level': 'DEBUG',
+        #    'class': 'logging.FileHandler',
+        #    'filename': 'mysite.log',
+        #    'formatter': 'verbose'
+        #},
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers':['console'],
+            #'propagate': True,
+            'level':'DEBUG',
+        },
+        'elezioni': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        },
+    }
+}

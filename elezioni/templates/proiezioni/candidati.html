@@ -1,0 +1,60 @@
+{% extends "proiezioni/base.html" %}
+{% load eletags %}
+
+{% block title %}Proiezioni Candidati{% endblock %}
+{% block custum_style %}
+
+{% endblock %}
+
+{% block content %}
+    <h1>{{ elezione }}</h1>
+    <a href="{% url 'crea_proiezione' elezione.id %}">Crea Proiezione</a><br>
+    <div class="row">
+    {% with proiezione=elezione.proiezioni.all.last %}
+        <i>Copertura campione</i>: {{ proiezione.copertura }}%<br>
+        <i>Aggiornato al</i>: {{ proiezione.data_creazione|time:"H:i" }}
+        <div class="col-md-4">
+        <h4>Candidati</h4>
+        <ul>
+        {% for candidato in proiezione.candidati.all %}
+            <li><b>{{ candidato.candidato|upper }}</b><br>
+                <strong>{{ candidato.voti }}</strong>%
+                <small>
+                <{{ candidato.forbice|forbice_inf_of:candidato.voti }}<small class="text-muted">%</small>
+                –
+                {{ candidato.forbice|forbice_sup_of:candidato.voti }}<small class="text-muted">%</small>>
+                <<strong class="text-muted">{{ candidato.forbice }}</strong>%>
+                </small>
+                <br>
+                <strong>{{ candidato.voti_liste }}</strong>%
+                <small>
+                <{{ candidato.forbice_liste|forbice_inf_of:candidato.voti_liste }}<small class="text-muted">%</small>
+                –
+                {{ candidato.forbice_liste|forbice_sup_of:candidato.voti_liste }}<small class="text-muted">%</small>>
+                <<strong class="text-muted">{{ candidato.forbice_liste }}</strong>%>
+                </small>
+
+            </li>
+        {% endfor %}
+        </ul>
+        </div>
+        <div class="col-md-8">
+        <h4>Liste</h4>
+        <ul>
+            {% for lista in proiezione.liste.all %}
+            <li>{{ lista.lista|upper }}
+                <strong>{{ lista.voti }}</strong>%
+                <small>
+                <{{ lista.forbice|forbice_inf_of:lista.voti }}<small class="text-muted">%</small>
+                –
+                {{ lista.forbice|forbice_sup_of:lista.voti }}<small class="text-muted">%</small>>
+                <<strong class="text-muted">{{ lista.forbice }}</strong>%>
+                </small>
+            </li>
+            {% endfor %}
+        <ul>
+        </div>
+    {% endwith %}
+    </div>
+
+{% endblock %}

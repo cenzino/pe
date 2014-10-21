@@ -6,17 +6,20 @@ from .models import *
 # Create your views here.
 def home(request):
     elezioni = Elezione.objects.all()
-    return render(request, 'index.html', { 'elezioni': elezioni})
+    #return render(request, 'index.html', { 'elezioni': elezioni})
+    return render(request, 'login.html')
+
+def login(request):
+    #elezioni = Elezione.objects.all()
+    return render(request, 'login.html')
 
 def dettaglio(request, elezione_id):
     return HttpResponse("You're looking at question %s." % elezione_id)
 
 def proiezioni_index(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
-    elezione.aggiorna()
-    candidati = elezione.candidati.all()
-    sponsor = ["Sponsor %s" % (s+1) for s in range(8) ]
-    return render(request, 'proiezioni/index.html', { 'elezione': elezione, 'candidati': candidati, 'sponsor': sponsor })
+    elezione.proiezioni.last()
+    return render(request, 'proiezioni/candidati.html', { 'elezione': elezione })
 
 def proiezioni_candidati2(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
@@ -26,7 +29,7 @@ def proiezioni_candidati2(request, elezione_id):
 
 def proiezioni_liste(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
-    elezione.aggiorna()
+
     candidati = elezione.candidati.all()
     return render(request, 'proiezioni/liste.html', { 'elezione': elezione, 'candidati': candidati })
 
@@ -74,81 +77,32 @@ def edita_sezione(request, sezione_id):
 
     return render(request, 'rilevazione/edita_sezione.html', { 'sezione': sezione, 'form': form})
 
-
-def report_candidati_dati_grezzi(request, elezione_id):
-    elezione = get_object_or_404(Elezione, pk=elezione_id)
-    #elezione.c_aggiorna()
-    risultati = elezione.c_get_risultati()
-    return render(request, 'report/index.html', { 'elezione': elezione, 'risultati': risultati })
-
-def report_candidati_dati_ponderati(request, elezione_id):
-    elezione = get_object_or_404(Elezione, pk=elezione_id)
-    #elezione.c_aggiorna()
-    elezione.pondera(candidati=True)
-    risultati = elezione.c_get_risultati_candidati_full()
-    return render(request, 'report/index.html', { 'elezione': elezione, 'risultati': risultati })
-
-def report_liste_dati_grezzi(request, elezione_id):
-    elezione = get_object_or_404(Elezione, pk=elezione_id)
-    #elezione.c_aggiorna()
-    risultati = elezione.c_get_risultati_liste()
-    return render(request, 'report/index.html', { 'elezione': elezione, 'risultati': risultati })
-
-def report_liste_dati_ponderati(request, elezione_id):
-    elezione = get_object_or_404(Elezione, pk=elezione_id)
-    #elezione.c_aggiorna()
-    elezione.crea_proiezione()
-    elezione.pondera(liste=True)
-    risultati = elezione.c_get_risultati_liste_full()
-    return render(request, 'report/index.html', { 'elezione': elezione, 'risultati': risultati })
-
-def report_liste(request, elezione_id):
-    elezione = get_object_or_404(Elezione, pk=elezione_id)
-    #elezione.aggiorna()
-    return render(request, 'report/liste.html', { 'elezione': elezione })
-
 from django.core import serializers
-def data(request, elezione_id):
+
+def crea_proiezione(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
-    data = serializers.serialize("json", elezione.sezioni.all(), indent=4, use_natural_foreign_keys=True, use_natural_primary_keys=True)
-    return HttpResponse(data, content_type='application/json')
-    #return HttpResponse(simplejson.dumps(shipments, ensure_ascii=False, default=json_formatter), mimetype='application/json')
+    p = Proiezione(elezione=elezione, copertura=0).save()
+    data = serializers.serialize("json", Proiezione.objects.all())
+    #return HttpResponse(data, content_type="application/json")
+    return redirect('proiezioni_candidati', elezione_id=elezione_id)
 
-#--------------
-def report_test(request, elezione_id):
+
+def report_candidati(request, elezione_id, ponderati=False):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
-    elezione.pondera(candidati=True)
-    #elezione.aggiorna()
-    #elezione.c_aggiorna()
-    risultati = {}
-    sezioni = []
 
-    risultati = elezione.c_get_risultati()
-    risultati2 = elezione.c_get_risultati('ponderati')
-    return render(request, 'report/test.html', { 'elezione': elezione, 'risultati': risultati, 'risultati2': risultati2 })
-#---------------
-
-def report_test_liste(request, elezione_id):
-    elezione = get_object_or_404(Elezione, pk=elezione_id)
-    #elezione.aggiorna()
-    #elezione.c_aggiorna()
-    elezione.pondera(liste=True)
-    risultati = elezione.c_get_risultati_liste()
-    risultati2 = elezione.c_get_risultati_liste('ponderati')
-    return render(request, 'report/test.html', { 'elezione': elezione, 'risultati': risultati, 'risultati2': risultati2 })
-
-
-def report_test3(request, elezione_id):
-    elezione = get_object_or_404(Elezione, pk=elezione_id)
-    #elezione.aggiorna()
-    #elezione.c_aggiorna()
     elezione.pondera()
-    risultati = elezione.c_get_risultati_candidati_full()
-    data = risultati
 
-    return render(request, 'report/test3.html', { 'risultati': risultati })
+    return render(request, 'report/z.html', { 'elezione': elezione,
+                                              'risultati': elezione.get_risultati(Candidato, False),
+                                              'risultati2': elezione.get_risultati(Candidato, True)
+    })
 
-def z(request, elezione_id):
-    elezione = get_object_or_404(Elezione.objects.select_related('sezioni'), pk=elezione_id)
+def report_liste(request, elezione_id, ponderati=False):
+    elezione = get_object_or_404(Elezione, pk=elezione_id)
 
-    return render(request, 'report/z.html', { 'elezione': elezione, 'risultati': elezione.get_risultati(Candidato) })
+    elezione.pondera()
+
+    return render(request, 'report/z.html', { 'elezione': elezione,
+                                              'risultati': elezione.get_risultati(Lista, False),
+                                              'risultati2': elezione.get_risultati(Lista, True)
+    })

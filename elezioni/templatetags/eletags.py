@@ -33,7 +33,7 @@ def forbice_sup_of(forbice, valore):
     try:
         f = float(valore) + float(forbice)
         if f <= 100:
-            return "%.1f" % abs(float(f))
+            return "%.1f" % abs(f)
         else:
             return 100
     except ValueError:
@@ -44,7 +44,7 @@ def forbice_inf_of(forbice, valore):
     try:
         f = float(valore) - float(forbice)
         if f >= 0:
-            return "%.1f" % abs(float(f))
+            return "%.1f" % abs(f)
         else:
             return 0
     except ValueError:

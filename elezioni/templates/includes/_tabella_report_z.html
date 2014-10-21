@@ -22,9 +22,11 @@
         </tr>
     </thead>
     <tbody>
+        {% comment %}
         <tr style="background-color: #eee; font-weight: bold">
             {% include "includes/_tabella_report_riga_z.html" with sezione=risultati.totali %}
         </tr>
+        {% endcomment %}
         {% for sezione in risultati.sezioni %}
 
             <tr>

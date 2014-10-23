@@ -1,7 +1,8 @@
 body {
     /* background-color: #f8f8f8; */
-    background-color: #eeeeee;
+    /* background-color: #eeeeee; */
     font-family: "Roboto", sans-serif;
+    padding-top: 40px;
 }
 
 .navbar-default {
@@ -29,6 +30,10 @@ line-height: 20px;
     color: #FFF;
 }
 
+.color-base-border {
+    border-color: #8dc63f;
+}
+
 @media screen and (min-width: 768px) {
     .jumbotron {
         padding-top: 48px;
@@ -38,8 +43,8 @@ line-height: 20px;
 
 .jumbotron {
     padding: 0px;
-    padding-bottom: 18px;
-    padding-top: 60px;
+    padding-bottom: 8px;
+    padding-top: 0px;
     margin-bottom: 30px;
     /*
     box-shadow: 0px 1px 4px rgba(0,0,0,.3);
@@ -53,4 +58,72 @@ line-height: 20px;
 .shadow {
     box-shadow: 0px 1px 4px rgba(0,0,0,.3);
     -webkit-font-smoothing: antialiased;
+}
+
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  padding: 6px 0;
+  /*font-size: 12px;*/
+  font-size: 1em;
+  line-height: 1.428571429;
+  /* border-radius: 15px; */
+    border-radius: 50%;
+}
+.btn-circle.btn-lg {
+  width: 50px;
+  height: 50px;
+  padding: 10px 16px;
+  /* font-size: 19px; */
+  font-size: 1em;
+  line-height: 1.33;
+  /* border-radius: 25px; */
+    border-radius: 25px;
+
+
+}
+.btn-circle.btn-xl {
+  width: 60px;
+  height: 60px;
+  padding: 10px 16px;
+  /*font-size: 24px;*/
+    font-size: 1em;
+  line-height: 1.33;
+  border-radius: 35px;
+}
+
+#btn-menu {
+    margin-top: -17px;
+    margin-bottom: -50px;
+    padding:0;
+}
+#btn-menu .btn-main-menu {
+    border-color: #8dc63f;
+    background-color: #FFF;
+    color: #8dc63f;
+      box-shadow: 0px 1px 18px rgba(0,0,0,.3);
+    -webkit-font-smoothing: antialiased;
+
+}
+
+#notify {
+    background-color: rgba(255,0,0,.7);
+    font-size: xx-small;
+    padding: 3px 5px;
+    margin: -5px -20px;
+}
+
+.navbar-inverse {
+    background-color: #8dc63f;
+    border-color: #8dc63f;
+}
+
+.navbar-inverse .navbar-nav>li>a {
+    color: #FFF;
+}
+
+.navbar-inverse .navbar-nav>.open>a, .navbar-inverse .navbar-nav>.open>a:hover, .navbar-inverse .navbar-nav>.open>a:focus {
+    background-color: rgba(0,0,0,.05);
 }

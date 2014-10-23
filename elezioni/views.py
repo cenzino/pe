@@ -1,41 +1,34 @@
 from django.shortcuts import get_object_or_404, render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 from .models import *
 
-# Create your views here.
 def home(request):
     elezioni = Elezione.objects.all()
-    #return render(request, 'index.html', { 'elezioni': elezioni})
-    return render(request, 'login.html')
+    return render(request, 'index.html', { 'elezioni': elezioni})
+    #return render(request, 'login.html')
 
 def login(request):
-    #elezioni = Elezione.objects.all()
     return render(request, 'login.html')
 
-def dettaglio(request, elezione_id):
-    return HttpResponse("You're looking at question %s." % elezione_id)
+# ### PROIEZIONI
+# ### ==================================================
 
-def proiezioni_index(request, elezione_id):
+def proiezioni_candidati(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
-    elezione.proiezioni.last()
     return render(request, 'proiezioni/candidati.html', { 'elezione': elezione })
-
-def proiezioni_candidati2(request, elezione_id):
-    elezione = get_object_or_404(Elezione, pk=elezione_id)
-    elezione.aggiorna()
-    candidati = elezione.candidati.all()
-    return render(request, 'proiezioni/candidati2.html', { 'elezione': elezione, 'candidati': candidati })
 
 def proiezioni_liste(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
-    candidati = elezione.candidati.all()
-    return render(request, 'proiezioni/liste.html', { 'elezione': elezione, 'candidati': candidati })
+    return render(request, 'proiezioni/liste.html', { 'elezione': elezione })
+
+# ### RILEVAZIONE
+# ### ==================================================
 
 def rilevazione_index(request, sezione_id):
     sezione = get_object_or_404(Sezione, pk=sezione_id)
-    return render(request, 'rilevazione/index.html', { 'sezione': sezione})
+    return render(request, 'rilevazione/test.html', {'sezione': sezione})
 
 def aumentaVotoCandidato(request, votocandidato_id):
     voto_candidato = get_object_or_404(VotiCandidato, pk=votocandidato_id)
@@ -79,6 +72,9 @@ def edita_sezione(request, sezione_id):
 
 from django.core import serializers
 
+# ### REPORT
+# ### ==================================================
+
 def crea_proiezione(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
     p = Proiezione(elezione=elezione, copertura=0).save()
@@ -90,9 +86,9 @@ def crea_proiezione(request, elezione_id):
 def report_candidati(request, elezione_id, ponderati=False):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
-    elezione.pondera()
+    elezione._pondera(Candidato)
 
-    return render(request, 'report/z.html', { 'elezione': elezione,
+    return render(request, 'report/report.html', { 'elezione': elezione,
                                               'risultati': elezione.get_risultati(Candidato, False),
                                               'risultati2': elezione.get_risultati(Candidato, True)
     })
@@ -100,9 +96,64 @@ def report_candidati(request, elezione_id, ponderati=False):
 def report_liste(request, elezione_id, ponderati=False):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
-    elezione.pondera()
+    elezione._pondera(Lista)
 
-    return render(request, 'report/z.html', { 'elezione': elezione,
+    return render(request, 'report/report.html', { 'elezione': elezione,
                                               'risultati': elezione.get_risultati(Lista, False),
                                               'risultati2': elezione.get_risultati(Lista, True)
     })
+
+from django.conf import settings
+import time
+
+def test(request):
+    print request.POST
+    if request.is_ajax():
+        if getattr(settings, 'DEBUG', False): # only if DEBUG=True
+            import time
+            import random
+            time.sleep(random.randint(0,4)) # delay AJAX response for 5 seconds
+        print "Ajax"
+        try:
+            id = int(request.POST['vid'])
+            v = get_object_or_404(VotiCandidato, pk=id)
+            op = str(request.POST['op'])
+
+            voti = v.voti + (1 if op == 'inc' else -1)
+            if voti >= 0:
+                v.voti = voti
+                v.save()
+            #board_pk = int(request.POST['board'])
+            #moves = list(map(int, request.POST['move_list'].split(',')))
+        except KeyError:
+            return HttpResponse('Error') # incorrect post
+        # do stuff, e.g. calculate a score
+        return HttpResponse(v.voti)
+    else:
+        raise Http404
+
+def test2(request):
+    print request.POST
+    if request.is_ajax():
+        if getattr(settings, 'DEBUG', False): # only if DEBUG=True
+            import time
+            import random
+            time.sleep(random.randint(0,2)) # delay AJAX response for 5 seconds
+        print "Ajax"
+        try:
+            id = int(request.POST['vid'])
+            v = get_object_or_404(VotiLista, pk=id)
+            op = str(request.POST['op'])
+
+            voti = v.voti + (1 if op == 'inc' else -1)
+            if voti >= 0:
+                v.voti = voti
+                v.save()
+            #board_pk = int(request.POST['board'])
+            #moves = list(map(int, request.POST['move_list'].split(',')))
+        except KeyError:
+            return HttpResponse('Error') # incorrect post
+        # do stuff, e.g. calculate a score
+        return HttpResponse(v.voti)
+    else:
+        raise Http404

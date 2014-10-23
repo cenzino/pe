@@ -1,44 +1,37 @@
 {% extends "proiezioni/base.html" %}
-{% load eletags %}
+{% load eletags humanize %}
 
 {% block title %}Proiezioni Candidati{% endblock %}
 {% block custum_style %}
 
 {% endblock %}
 
-{% block content %}
-    <h1>{{ elezione }}</h1>
-    <a href="{% url 'crea_proiezione' elezione.id %}">Crea Proiezione</a><br>
-    <div class="row">
-    {% with proiezione=elezione.proiezioni.all.last %}
-        <i>Copertura campione</i>: {{ proiezione.copertura }}%<br>
-        <i>Aggiornato al</i>: {{ proiezione.data_creazione|time:"H:i" }}
-        <div class="col-md-4">
-        <h4>Candidati</h4>
-        <ul>
-        {% for candidato in proiezione.candidati.all %}
-            <li><b>{{ candidato.candidato|upper }}</b><br>
-                <strong>{{ candidato.voti }}</strong>%
-                <small>
-                <{{ candidato.forbice|forbice_inf_of:candidato.voti }}<small class="text-muted">%</small>
-                –
-                {{ candidato.forbice|forbice_sup_of:candidato.voti }}<small class="text-muted">%</small>>
-                <<strong class="text-muted">{{ candidato.forbice }}</strong>%>
-                </small>
-                <br>
-                <strong>{{ candidato.voti_liste }}</strong>%
-                <small>
-                <{{ candidato.forbice_liste|forbice_inf_of:candidato.voti_liste }}<small class="text-muted">%</small>
-                –
-                {{ candidato.forbice_liste|forbice_sup_of:candidato.voti_liste }}<small class="text-muted">%</small>>
-                <<strong class="text-muted">{{ candidato.forbice_liste }}</strong>%>
-                </small>
+{% block proiezione %}
+    <div class="container-fluid">
 
-            </li>
-        {% endfor %}
-        </ul>
+
+
+    {% with proiezione=elezione.proiezioni.all.last %}
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{% url 'crea_proiezione' elezione.id %}">Crea Proiezione</a><br>
+            <i>Copertura campione</i>: {{ proiezione.copertura }}%<br>
+            <i>Dati aggiornati alle</i>: {{ proiezione.data_creazione|date:'G:i' }} <small>({{ proiezione.data_creazione|naturaltime }}</small>)
         </div>
-        <div class="col-md-8">
+    </div>
+    <div class="row">
+    {% for candidato in proiezione.candidati.all %}
+        <div class="col-md-3">
+            {% include 'includes/_proiezioni_candidato.html' with candidato=candidato %}
+        </div>
+    {% endfor %}
+    </div>
+
+    {% endwith %}
+    </div>
+{% endblock %}
+
+        {% comment %}
         <h4>Liste</h4>
         <ul>
             {% for lista in proiezione.liste.all %}
@@ -53,8 +46,4 @@
             </li>
             {% endfor %}
         <ul>
-        </div>
-    {% endwith %}
-    </div>
-
-{% endblock %}
+        {% endcomment %}

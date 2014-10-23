@@ -7,13 +7,12 @@ from django.conf.urls.static import static
 
 urlpatterns = patterns('',
     url(r'^$', views.home, name='home'),
-    url(r'^(?P<elezione_id>\d+)/$', views.dettaglio, name='dettaglio'),
+    #url(r'^(?P<elezione_id>\d+)/$', views.dettaglio, name='dettaglio'),
 
     url(r'^proiezioni/(?P<elezione_id>\d+)/p/$', views.crea_proiezione, name='crea_proiezione'),
 
     url(r'^proiezioni/(?P<elezione_id>\d+)/$', RedirectView.as_view(pattern_name='proiezioni_candidati'), name='proiezioni_home'),
-    url(r'^proiezioni/(?P<elezione_id>\d+)/candidati/$', views.proiezioni_index, name='proiezioni_candidati'),
-    url(r'^proiezioni/(?P<elezione_id>\d+)/candidati2/$', views.proiezioni_candidati2, name='proiezioni_candidati2'),
+    url(r'^proiezioni/(?P<elezione_id>\d+)/candidati/$', views.proiezioni_candidati, name='proiezioni_candidati'),
     url(r'^proiezioni/(?P<elezione_id>\d+)/liste/$', views.proiezioni_liste, name='proiezioni_liste'),
 
     url(r'^report/(?P<elezione_id>\d+)/$', RedirectView.as_view(pattern_name='report_candidati'), name='report_home'),
@@ -27,5 +26,10 @@ urlpatterns = patterns('',
     url(r'^rilevazione/(?P<votocandidato_id>\d+)/diminuisciC/$', views.diminuisciVotoCandidato, name='diminuisciVotoCandidato'),
     url(r'^rilevazione/(?P<votolista_id>\d+)/aumentaL/$', views.aumentaVotoLista, name='aumentaVotoLista'),
     url(r'^rilevazione/(?P<votolista_id>\d+)/diminuisciL/$', views.diminuisciVotoLista, name='diminuisciVotoLista'),
+
+
+
+    url(r'^test$', views.test, name='test'),
+    url(r'^test2$', views.test2, name='test2'),
 )# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

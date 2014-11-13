@@ -11,14 +11,17 @@ urlpatterns = patterns('',
 
     url(r'^proiezioni/(?P<elezione_id>\d+)/p/$', views.crea_proiezione, name='crea_proiezione'),
 
-    url(r'^proiezioni/(?P<elezione_id>\d+)/$', RedirectView.as_view(pattern_name='proiezioni_candidati'), name='proiezioni_home'),
+    url(r'^proiezioni/$', views.proiezioni_home, name='proiezioni_home'),
     url(r'^proiezioni/(?P<elezione_id>\d+)/candidati/$', views.proiezioni_candidati, name='proiezioni_candidati'),
     url(r'^proiezioni/(?P<elezione_id>\d+)/liste/$', views.proiezioni_liste, name='proiezioni_liste'),
+    url(r'^proiezioni/(?P<elezione_id>\d+)/candidato/$', views.proiezioni_candidato_one, name='proiezioni_candidato_one'),
+    url(r'^proiezioni/(?P<elezione_id>\d+)/candidato/(?P<candidato_id>\d+)/$', views.proiezioni_candidato, name='proiezioni_candidato'),
 
-    url(r'^report/(?P<elezione_id>\d+)/$', RedirectView.as_view(pattern_name='report_candidati'), name='report_home'),
+    url(r'^report/$', views.report_home, name='report_home'),
     url(r'^report/(?P<elezione_id>\d+)/candidati/$', views.report_candidati, {'ponderati': True }, name='report_candidati'),
     url(r'^report/(?P<elezione_id>\d+)/liste/$', views.report_liste, name='report_liste'),
 
+    url(r'^rilevazione/$', views.rilevazione_home, name='rilevazione_home'),
     url(r'^rilevazione/(?P<sezione_id>\d+)/$', views.rilevazione_index, name='rilevazione_index'),
 
     url(r'^rilevazione/(?P<sezione_id>\d+)/edita/$', views.edita_sezione, name='edita_sezione'),

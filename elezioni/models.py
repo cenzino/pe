@@ -2,6 +2,16 @@ from django.db import models
 from django.db.models import Sum, Max
 from math import sqrt
 from django.core import serializers
+from django.core import urlresolvers
+
+from ProiezioniElezioni import settings
+from utenti.models import Rilevatore
+
+def _get_admin_url(self):
+    return urlresolvers.reverse("admin:%s_%s_change" % (self._meta.app_label, self._meta.module_name), args=(self.id,))
+
+_get_admin_url.short_description = 'Operazioni'
+models.Model.get_admin_url = _get_admin_url
 
 class Elezione(models.Model):
     titolo = models.CharField(max_length=255)
@@ -32,11 +42,15 @@ class Elezione(models.Model):
 
         copertura_campione = self.get_copertura_campione()
 
+        """
         risultati_sezioni = self.sezioni.select_related('voti%(elemento)s_set').annotate(
             schede_valide=Sum('voti%s__voti' % (elemento))
         )
-
-        print risultati_sezioni.values()
+        """
+        risultati_sezioni = Sezione.attive.filter(elezione_id=self.id).select_related('voti%(elemento)s_set').annotate(
+            schede_valide=Sum('voti%s__voti' % (elemento))
+        )
+        print risultati_sezioni.values('numero','attiva')
 
         for sezione in risultati_sezioni:
             schede_scrutinate = sezione.schede_valide + sezione.schede_nulle + sezione.schede_bianche
@@ -70,9 +84,17 @@ class Elezione(models.Model):
             tipo = '_mod'
             elementi_tipo = '%s_%s' % (tipo, elementi)
 
+        """
         risultati_sezioni = self.sezioni.select_related('voti%(elemento)s_set').annotate(
             schede_valide=Sum('voti%s__voti%s' % (elemento, tipo))
         )
+        """
+
+        risultati_sezioni = Sezione.attive.filter(elezione_id=self.id).select_related('voti%(elemento)s_set').annotate(
+            schede_valide=Sum('voti%s__voti%s' % (elemento, tipo))
+        )
+        print "*"*20
+        print risultati_sezioni.values('numero','attiva')
 
         for sezione in risultati_sezioni:
             sezione.schede_nulle = getattr(sezione, "schede_nulle%s" % (elementi_tipo))
@@ -95,10 +117,11 @@ class Elezione(models.Model):
                 'schede_bianche': totali['schede_bianche%s__sum' % (elementi_tipo)],
                 'schede_nulle': totali['schede_nulle%s__sum' % (elementi_tipo)],
                 'schede_valide': totali['schede_valide__sum'],
-                'elementi': getattr(self, "%s" % (elementi)).select_related('voti%(elemento)s_set').annotate(rvoti=Sum('voti%s__voti%s' % (elemento, tipo)))
+                'elementi': getattr(self, "%s" % (elementi)).select_related('voti%(elemento)s_set').filter(**{"voti%s__sezione__attiva" % (elemento): True}).annotate(rvoti=Sum('voti%s__voti%s' % (elemento, tipo)))
 
             }
         }
+        print risultati['totali']
         return risultati
 
     def __str__(self):
@@ -106,6 +129,10 @@ class Elezione(models.Model):
 
     class Meta:
         verbose_name_plural = "Elezioni"
+
+class SezioniAttiveManager(models.Manager):
+    def get_queryset(self):
+        return super(SezioniAttiveManager, self).get_queryset().filter(attiva=True)
 
 class Sezione(models.Model):
     numero = models.PositiveSmallIntegerField()
@@ -119,11 +146,16 @@ class Sezione(models.Model):
     schede_nulle = models.PositiveIntegerField(default=0)
     schede_bianche = models.PositiveIntegerField(default=0)
 
-    schede_nulle_mod_candidati = models.PositiveIntegerField(default=0)
-    schede_bianche_mod_candidati = models.PositiveIntegerField(default=0)
+    schede_nulle_mod_candidati = models.PositiveIntegerField(default=0, editable=False)
+    schede_bianche_mod_candidati = models.PositiveIntegerField(default=0, editable=False)
 
-    schede_nulle_mod_liste = models.PositiveIntegerField(default=0)
-    schede_bianche_mod_liste = models.PositiveIntegerField(default=0)
+    schede_nulle_mod_liste = models.PositiveIntegerField(default=0, editable=False)
+    schede_bianche_mod_liste = models.PositiveIntegerField(default=0, editable=False)
+
+    rilevatore = models.ForeignKey(Rilevatore, related_name='sezioni', related_query_name='sezione', null=True, blank=True)
+
+    objects = models.Manager()
+    attive = SezioniAttiveManager()
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
@@ -141,10 +173,37 @@ class Sezione(models.Model):
         ordering = ['numero']
         verbose_name_plural = "Sezioni"
 
+import os
+import uuid
+
+#@staticmethod
+def _generate_new_filename(instance, filename):
+    f, ext = os.path.splitext(filename)
+    return '%s%s' % (uuid.uuid4().hex, ext)
+
+
+def _get_image_path(instance, filename):
+    return '{}elezione-{}/{}/{}'.format(settings.UPLOAD_IMG_PATH, instance.elezione.pk, instance.__class__.__name__.lower(),filename)
+
+get_image_path = _get_image_path
+
+def _path_and_rename(path):
+    def wrapper(instance, filename):
+        ext = filename.split('.')[-1]
+        # get filename
+        if instance.pk:
+            filename = '{}.{}'.format(instance.pk, ext)
+        else:
+            # set filename as random string
+            filename = '{}.{}'.format(uuid.uuid4(), ext)
+        # return the whole path to the file
+        return os.path.join(path, filename)
+    return wrapper
+
 class Candidato(models.Model):
     nome = models.CharField(max_length=50)
     cognome = models.CharField(max_length=50)
-    foto = models.ImageField(upload_to='images/foto/', blank=True, null=True)
+    foto = models.ImageField(upload_to=_get_image_path, blank=True, null=True)
     voti_sezione = models.ManyToManyField(Sezione, through='VotiCandidato', related_name="voti_candidato", related_query_name="voto_candidato")
     elezione = models.ForeignKey(Elezione, related_name="candidati", related_query_name="candidato")
 
@@ -160,6 +219,10 @@ class Candidato(models.Model):
 
     nome_short = property(_get_nome_short)
 
+    def is_test(self):
+        return True
+    is_test.short_description = 'Test'
+
     def __str__(self):
         return "%s" % (self.cognome)
 
@@ -170,16 +233,18 @@ class Candidato(models.Model):
 class Lista(models.Model):
     nome = models.CharField(max_length=100)
     sigla = models.CharField(max_length=20, blank=True)
-    simbolo = models.ImageField(upload_to='images/simboli/', blank=True, null=True)
+    simbolo = models.ImageField(upload_to=_get_image_path, blank=True, null=True)
     voti_sezione = models.ManyToManyField(Sezione, through='VotiLista', related_name="voti_lista", related_query_name="voto_lista")
-    elezione = models.ForeignKey(Elezione, related_name="liste", related_query_name="lista")
+    elezione = models.ForeignKey(Elezione, related_name="liste", related_query_name="lista", editable=False)
     candidato = models.ForeignKey(Candidato, related_name="liste", related_query_name="lista")
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+        self.elezione_id = self.candidato.elezione_id
         super(Lista, self).save(*args, **kwargs)
 
         if is_new:
+            #self.elezione_id = self.candidato.elezione_id
             VotiLista.objects.bulk_create(
                 [VotiLista(lista=self, sezione=sezione) for sezione in self.elezione.sezioni.all()])
 
@@ -194,7 +259,7 @@ class VotiCandidato(models.Model):
     candidato = models.ForeignKey(Candidato)
     sezione = models.ForeignKey(Sezione)
     voti = models.IntegerField(default=0)
-    voti_mod = models.IntegerField(default=0)
+    voti_mod = models.IntegerField(default=0, editable=False)
 
     def __str__(self):
         return "%s - %s" % (self.candidato, self.sezione)
@@ -207,13 +272,14 @@ class VotiLista(models.Model):
     lista = models.ForeignKey(Lista)
     sezione = models.ForeignKey(Sezione)
     voti = models.IntegerField(default=0)
-    voti_mod = models.IntegerField(default=0)
+    voti_mod = models.IntegerField(default=0, editable=False)
 
     def __str__(self):
         return "%s - %s" % (self.lista, self.sezione)
 
     class Meta:
         verbose_name_plural = "VotiLista"
+
 
 class Proiezione(models.Model):
     data_creazione = models.DateTimeField(auto_now_add=True)
@@ -222,10 +288,14 @@ class Proiezione(models.Model):
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
+
         super(Proiezione, self).save(*args, **kwargs)
+        self.copertura = self.elezione.get_copertura_campione()
+        super(Proiezione, self).save(*args, **kwargs)
+
         if is_new:
-            candidati = self.elezione.candidati.select_related('voticandidato_set', 'lista_set').order_by('id').annotate(voti_totali=Sum('voticandidato__voti_mod'))
-            liste = self.elezione.liste.select_related('candidato','votilista').annotate(voti_totali=Sum('votilista__voti_mod'))
+            candidati = self.elezione.candidati.select_related('voticandidato_set', 'lista_set').filter(voticandidato__sezione__attiva=True).order_by('id').annotate(voti_totali=Sum('voticandidato__voti_mod'))
+            liste = self.elezione.liste.select_related('candidato','votilista').filter(votilista__sezione__attiva=True).annotate(voti_totali=Sum('votilista__voti_mod'))
 
             totale_voti_liste_per_candidato = liste.values('candidato').order_by('candidato_id').annotate(voti_totali=Sum('votilista__voti_mod'))
             totale_voti_liste = liste.aggregate(totale=Sum('voti_totali'))['totale']
@@ -235,11 +305,11 @@ class Proiezione(models.Model):
             _candidati = []
 
             aventi_diritto_totali = self.elezione.aventi_diritto
-            totali_candidati = self.elezione.sezioni.aggregate(nulle=Sum('schede_nulle_mod_candidati'),bianche=Sum('schede_bianche_mod_candidati'))
+            totali_candidati = Sezione.attive.filter(elezione_id=self.elezione_id).aggregate(nulle=Sum('schede_nulle_mod_candidati'),bianche=Sum('schede_bianche_mod_candidati'))
             _totale_scrutinate_candidati = totale_voti_candidati + totali_candidati['nulle'] + totali_candidati['bianche']
 
             if liste:
-                totali_liste = self.elezione.sezioni.aggregate(nulle=Sum('schede_nulle_mod_liste'),bianche=Sum('schede_bianche_mod_liste'))
+                totali_liste = Sezione.attive.filter(elezione_id=self.elezione_id).aggregate(nulle=Sum('schede_nulle_mod_liste'),bianche=Sum('schede_bianche_mod_liste'))
                 _totale_scrutinate_liste = totale_voti_liste + totali_candidati['nulle'] + totali_candidati['bianche']
 
             for i, candidato in enumerate(candidati):
@@ -248,7 +318,7 @@ class Proiezione(models.Model):
                 _forbice_liste = calcola_forbice(aventi_diritto_totali, _totale_scrutinate_liste, _voti_liste) if liste else 0
                 _candidati.append(DatiProiezioneCandidato(candidato=candidato, proiezione=self,
                                                           voti=round(float(candidato.voti_totali)/totale_voti_candidati*100, 1),
-                                                          voti_liste=round(float(_voti_liste)/totale_voti_liste*100, 1) if liste else 0,
+                                                          voti_liste=round(float(_voti_liste)/totale_voti_liste*100, 1) if (liste and totale_voti_liste != 0) else 0,
                                                           forbice=_forbice,
                                                           forbice_liste=_forbice_liste if liste else 0
                                                           ))
@@ -260,7 +330,7 @@ class Proiezione(models.Model):
                 for lista in liste:
                     _forbice = calcola_forbice(aventi_diritto_totali, _totale_scrutinate_liste, lista.voti_totali)
                     _liste.append(DatiProiezioneLista(lista=lista, proiezione=self,
-                                                      voti=round(float(lista.voti_totali)/totale_voti_liste*100, 1),
+                                                      voti=round(float(lista.voti_totali)/totale_voti_liste*100, 1) if totale_voti_liste != 0 else 0,
                                                       forbice=_forbice))
                 DatiProiezioneLista.objects.bulk_create(_liste)
 
@@ -280,7 +350,6 @@ class DatiProiezioneLista(models.Model):
     lista = models.ForeignKey(Lista)
     voti = models.DecimalField(max_digits=3, decimal_places=1)
     forbice = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
-
 
 def calcola_forbice(aventi_diritto_totali, totale_voti_scrutinati, voti_totali_elemento):
     percentuale_elemento = float(voti_totali_elemento)/totale_voti_scrutinati

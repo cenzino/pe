@@ -14,22 +14,23 @@
     {% with proiezione=elezione.proiezioni.all.last %}
     <div class="row">
         <div class="col-md-12">
-            <span>COPERTURA CAMPIONE: <b>{% widthratio proiezione.copertura 1 100%}%</b></span>
+            <span>COPERTURA CAMPIONE: <b>{% widthratio proiezione.copertura 1 100%}%</b><span>
 
             <span class="pull-right text-muted">
                 Dati aggiornati alle</i>: {{ proiezione.data_creazione|date:'G:i' }} <small>({{ proiezione.data_creazione|naturaltime }}</small>)
             </span>
         </div>
     </div>
-    <div class="row" style="padding-top: 20px;">
+
     {% for candidato in proiezione.candidati.all %}
-        <div class="col-md-3" style="padding: 5px;">
-            <a href="{% url 'proiezioni_candidato' elezione.id candidato.candidato_id %}">
-            {% include 'includes/_proiezioni_candidato.html' with candidato=candidato %}
-            </a>
+        {% if forloop.counter0 %}
+        <div class="row" style="padding-top: 60px; margin-bottom: 400px;">
+
+            {% include 'includes/_proiezioni_candidato_one.html' with candidato=candidato %}
         </div>
+        {% endif %}
     {% endfor %}
-    </div>
+
 
     {% endwith %}
     </div>

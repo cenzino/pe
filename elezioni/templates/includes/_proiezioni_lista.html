@@ -1,0 +1,24 @@
+{% load eletags %}
+<td>
+<img src="{{ MEDIA_URL }}{{ lista.lista.simbolo|default:"images/default.gif" }}" alt="..." class="img-responsive img-circle" style="width: 50px; height: 50px;">
+    <div class="caption text-center" style="background-color: white">
+
+
+        <div class="caption text-center pull-left" style="background-color: #111; color: #fff; ">
+
+
+
+        <span class="h5">{{ lista.lista.nome|upper }}</span>
+    </div>
+
+            {% with voti=lista.voti %}
+            <h1 class="" style="margin: 0">{{ voti|floatformat:1 }}<small>%</small></h1>
+            {% with forbice=lista.forbice %}
+            <p class="" style="font-size: 85%">
+                {{ forbice|forbice_inf_of:voti|floatformat:1 }}<small class="text-muted">%</small> –
+                {{ forbice|forbice_sup_of:voti|floatformat:1 }}<small class="text-muted">%</small>
+            </p>
+            {% endwith %}
+        {% endwith %}
+    </div>
+</td>

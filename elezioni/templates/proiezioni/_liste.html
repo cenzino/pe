@@ -1,0 +1,122 @@
+{% extends "proiezioni/base.html" %}
+{% load eletags %}
+
+{% block title %}Proiezioni Candidati{% endblock %}
+{% block custum_style %}
+<style>
+.thumbnail .caption {
+    padding: 2px;
+    color: #333;
+}
+
+.thumbnail .caption h1,
+.thumbnail .caption .h1,
+.thumbnail .caption h2,
+.thumbnail .caption .h2,
+.thumbnail .caption h3,
+.thumbnail .caption .h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.thumbnail .caption h1,
+.thumbnail .caption h2 {
+    margin-top: 2px;
+    margin-bottom: 1px;
+    font-weight: 700;
+}
+
+.thumbnail .caption p {
+    margin: 0px;
+}
+
+.media, .media .media {
+    margin-top: 7px;
+}
+
+.progress {
+    margin-bottom: 0px;
+}
+
+.progress.small {
+height: 14px;
+
+overflow: hidden;
+background-color: #f5f5f5;
+border-radius: 4px;
+-webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
+}
+
+.progress.small .progress-bar {
+float: left;
+width: 0;
+height: 100%;
+font-size: 12px;
+line-height: 16px;
+color: #fff;
+text-align: center;
+
+}
+
+h4 {
+    font-weight: 400;
+    font-size: 16px;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<table class="table table-bordered">
+    {% with  voti_totali_elezione=elezione.voti_totali_liste.voti_mod %}
+    {% for candidato in candidati|dictsortreversed:"voti_totali_liste.voti_mod" %}
+    <tr class="" style="background-color: #eee">
+        {% with perc_liste=candidato.voti_totali_liste.voti_mod|percentage:voti_totali_elezione %}
+        <td><h4 style="padding: 0; margin: 0; font-weight: 400;">{{ candidato.cognome|upper }} <span class="pull-right" style="font-size: 120%; font-weight: bold">{{ perc_liste }}%</span></h4></td>
+        <td>
+
+            <div class="progress">
+              <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ perc_liste }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ perc_liste }}%;">
+                  {{ perc_liste }}% <em>({{ candidato.voti_totali_liste.voti_mod }} voti)</em>
+              </div>
+            </div>
+        {% endwith %}
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td>
+            <ul class="media-list">
+            {% for lista in candidato.liste.all|dictsortreversed:"voti_totali.voti_mod" %}
+                {% with voti_totali_lista=lista.voti_totali.voti_mod %}
+                {% with perc=voti_totali_lista|percentage:voti_totali_elezione %}
+
+                  <li class="media">
+                    <a class="pull-left" href="#">
+                        {% if lista.simbolo %}
+                            <img class="media-object img-responsive img-circle" width="40px" src="{{ MEDIA_URL }}{{ lista.simbolo }}" alt=""/>
+                        {% else %}
+                            <img class="media-object img-responsive img-circle" width="40px" src="{{ MEDIA_URL }}images/default.gif" alt=""/>
+                        {% endif %}
+                    </a>
+                    <div class="media-body">
+                      <h4 class="media-heading">{{ lista|upper }} <strong>{{ perc }}%</strong></h4>
+                    <div class="progress small">
+                      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ perc }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ perc }}%;">
+                          {{ perc }}%
+                      </div>
+                    </div>
+                    </div>
+                  </li>
+
+                {% endwith %}
+                {% endwith %}
+            {% endfor %}
+            </ul>
+        </td>
+    </tr>
+    {% endfor %}
+    {% endwith %}
+</table>
+{% endblock %}

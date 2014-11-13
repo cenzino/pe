@@ -1,0 +1,52 @@
+{% load eletags %}
+<div class="col-md-3" style="padding: 5px;">
+    <div class="thumbnail">
+        <img src="{{ MEDIA_URL }}{{ candidato.candidato.foto|default:"images/default.gif" }}" alt="..." class="img-responsive" style="width:100%">
+
+        <div class="caption text-center"style="background-color: #111; color: #fff; ">
+            <span class="h5">{{ candidato.candidato.cognome|upper }}</span>
+        </div>
+        <div class="caption text-center" style="background-color: gold">
+            {% with voti=candidato.voti %}
+                <h1 class="" style="margin: 0">{{ voti|floatformat:1 }}<small>%</small></h1>
+                {% with forbice=candidato.forbice %}
+                <p class="" style="font-size: 85%">
+                    {{ forbice|forbice_inf_of:voti|floatformat:1 }}<small class="text-muted">%</small> –
+                    {{ forbice|forbice_sup_of:voti|floatformat:1 }}<small class="text-muted">%</small>
+                </p>
+                {% endwith %}
+            {% endwith %}
+        </div>
+    </div>
+</div>
+<div class="col-md-6" style="padding: 5px;">
+    <div class="">
+        <table class="table table-bordered">
+        {% for x in candidato.candidato.liste.all %}
+
+            {% if forloop.counter %}
+
+            {% for l in x.datiproiezionelista_set.all %}
+                {% if forloop.last %}
+                    <tr>
+                        <td><img src="{{ MEDIA_URL }}{{ l.lista.simbolo|default:"images/default.gif" }}" alt="..." class="img-responsive" style="width:50px"></td>
+                        <td>{{ l.lista.nome  }}</td>
+                        <td>
+                        {% with voti=l.voti %}
+                            <h1 class="" style="margin: 0">{{ voti|floatformat:1 }}<small>%</small></h1>
+                            {% with forbice=l.forbice %}
+                            <p class="" style="font-size: 85%">
+                                {{ forbice|forbice_inf_of:voti|floatformat:1 }}<small class="text-muted">%</small> –
+                                {{ forbice|forbice_sup_of:voti|floatformat:1 }}<small class="text-muted">%</small>
+                            </p>
+                            {% endwith %}
+                        {% endwith %}
+                        </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+            {% endif %}
+        {% endfor %}
+        </table>
+    </div>
+</div>

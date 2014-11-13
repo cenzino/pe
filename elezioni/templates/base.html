@@ -44,7 +44,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" href="{% url 'home' %}"><img src="{{ MEDIA_URL }}images/logo.png" alt="" class="" style="max-height: 40px"/> {% block brand %}{% endblock %}</a>
+          <a class="navbar-brand" href="{% url 'home' %}">{% block brand %}<img src="{{ MEDIA_URL }}images/logo.png" alt="" class="" style="max-height: 40px"/>{% endblock %}</a>
         </div>
         <div class="collapse navbar-collapse">
           <ul class="nav navbar-nav">
@@ -111,6 +111,9 @@
     </div>
 
     <div class="container">
+        <h1 style="margin-top: -10px;">{{ elezione }}<small></small></h1>
+
+        <div class="text-right">Ciao <b>{{ user }} {{ user.tipo }}</b> (<a href="{% url 'logout' %}">Esci</a>)</div>
         {% block content %}{% endblock %}
     </div><!-- /.container -->
 

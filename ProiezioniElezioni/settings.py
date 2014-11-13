@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.humanize',
     'debug_toolbar.apps.DebugToolbarConfig',
+    'utenti',
     'elezioni',
     'custom',
 )
@@ -53,6 +54,7 @@ MIDDLEWARE_CLASSES = (
     #'custom.middleware.debug.SQLLogMiddleware',
     #'custom.middleware.debug.SQLLogToConsoleMiddleware',
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 ROOT_URLCONF = 'ProiezioniElezioni.urls'
@@ -103,6 +105,8 @@ PROJECT_PATH = os.path.abspath(PROJECT_PATH)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media') # Absolute path to the media directory
 
+UPLOAD_IMG_PATH = 'upload/images/'
+"""
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -141,3 +145,8 @@ LOGGING = {
         },
     }
 }
+"""
+AUTH_USER_MODEL = 'utenti.BaseUtente'
+LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login/'
+LOGOUT_URL = '/logout/'

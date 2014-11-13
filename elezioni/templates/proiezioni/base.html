@@ -2,7 +2,7 @@
 
 {% block title %}Proiezioni{% endblock %}
 
-{% block brand %}{% endblock %}
+{% block brand %}Proiezioni{% endblock %}
 
 {% block navmenu %}
 <li class="dropdown-header">Proiezioni</li>
@@ -14,15 +14,11 @@
     <div class="row">
         <div class="col-md-8">
             {% block proiezione %}
-
-
             {% endblock %}
         </div>
-        <div class="col-md-4" style="background-color: #eee;">
-            <h5>Sponsor</h5>
+        <div class="col-md-4" style="">
             {% block sponsor %}
-
-
+                {% include 'includes/_sponsor.html' %}
             {% endblock %}
         </div>
     </div>

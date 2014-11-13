@@ -1,9 +1,7 @@
 from django.contrib import admin
 from .models import *
-# Register your models here.
-
-#admin.site.register(Elezione)
-#admin.site.register(Sezione)
+from django.core import urlresolvers
+from django.utils.html import format_html
 
 class SezioneInline(admin.TabularInline):
     model = Sezione
@@ -16,16 +14,24 @@ class ListaInline(admin.TabularInline):
 
 class CandidatoInline(admin.TabularInline):
     model = Candidato
-    fields = ('cognome', 'nome', 'foto')
-    #list_display = ('cognome', 'nome')
+    fields = ('cognome', 'nome', 'foto', 'admin_url')
+    readonly_fields = ('admin_url',)
     extra = 0
+
+    def admin_url(self, obj):
+        return '<a href="%s">%s</a>' % (obj.get_admin_url(), 'Liste')
+
+    admin_url.allow_tags = True
+    admin_url.short_description = 'Edita'
+
+
 
 @admin.register(Elezione)
 class ElezioneAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
-            'fields': (('titolo', 'descrizione'), 'chiusa', 'aventi_diritto', 'copertura_simulata')
-        }),
+            'fields': (('titolo', 'descrizione'), 'chiusa', 'aventi_diritto', 'copertura_simulata')}),
+        #('Ricercatori', {'fields': ('ricercatori',)}),
     )
     inlines = [
         CandidatoInline,
@@ -38,7 +44,7 @@ class ElezioneAdmin(admin.ModelAdmin):
             "all": ("admin.css",)
         }
 
-@admin.register(VotiCandidato)
+#@admin.register(VotiCandidato)
 class VotiCandidatoAdmin(admin.ModelAdmin):
     list_display = ('sezione','candidato','voti')
     readonly_fields=('sezione','candidato',)
@@ -52,7 +58,7 @@ class VotiCandidatoAdmin(admin.ModelAdmin):
         return False
 
 
-admin.site.register(VotiLista)
+#admin.site.register(VotiLista)
 
 class VotiCandidatoInline(admin.TabularInline):
     list_display = ('sezione','candidato','voti')
@@ -108,3 +114,4 @@ class CandidatoAdmin(admin.ModelAdmin):
     inlines = [
         ListaInline,
     ]
+

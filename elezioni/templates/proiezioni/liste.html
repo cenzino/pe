@@ -1,122 +1,75 @@
 {% extends "proiezioni/base.html" %}
-{% load eletags %}
+{% load eletags humanize %}
 
 {% block title %}Proiezioni Candidati{% endblock %}
 {% block custum_style %}
-<style>
-.thumbnail .caption {
-    padding: 2px;
-    color: #333;
-}
 
-.thumbnail .caption h1,
-.thumbnail .caption .h1,
-.thumbnail .caption h2,
-.thumbnail .caption .h2,
-.thumbnail .caption h3,
-.thumbnail .caption .h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-}
-
-.thumbnail .caption h1,
-.thumbnail .caption h2 {
-    margin-top: 2px;
-    margin-bottom: 1px;
-    font-weight: 700;
-}
-
-.thumbnail .caption p {
-    margin: 0px;
-}
-
-.media, .media .media {
-    margin-top: 7px;
-}
-
-.progress {
-    margin-bottom: 0px;
-}
-
-.progress.small {
-height: 14px;
-
-overflow: hidden;
-background-color: #f5f5f5;
-border-radius: 4px;
--webkit-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
-box-shadow: inset 0 1px 2px rgba(0,0,0,.1);
-}
-
-.progress.small .progress-bar {
-float: left;
-width: 0;
-height: 100%;
-font-size: 12px;
-line-height: 16px;
-color: #fff;
-text-align: center;
-
-}
-
-h4 {
-    font-weight: 400;
-    font-size: 16px;
-}
-
-</style>
 {% endblock %}
 
-{% block content %}
-<table class="table table-bordered">
-    {% with  voti_totali_elezione=elezione.voti_totali_liste.voti_mod %}
-    {% for candidato in candidati|dictsortreversed:"voti_totali_liste.voti_mod" %}
-    <tr class="" style="background-color: #eee">
-        {% with perc_liste=candidato.voti_totali_liste.voti_mod|percentage:voti_totali_elezione %}
-        <td><h4 style="padding: 0; margin: 0; font-weight: 400;">{{ candidato.cognome|upper }} <span class="pull-right" style="font-size: 120%; font-weight: bold">{{ perc_liste }}%</span></h4></td>
-        <td>
+{% block proiezione %}
 
-            <div class="progress">
-              <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ perc_liste }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ perc_liste }}%;">
-                  {{ perc_liste }}% <em>({{ candidato.voti_totali_liste.voti_mod }} voti)</em>
-              </div>
-            </div>
-        {% endwith %}
-        </td>
-    </tr>
-    <tr>
-        <td></td>
-        <td>
-            <ul class="media-list">
-            {% for lista in candidato.liste.all|dictsortreversed:"voti_totali.voti_mod" %}
-                {% with voti_totali_lista=lista.voti_totali.voti_mod %}
-                {% with perc=voti_totali_lista|percentage:voti_totali_elezione %}
+    <div class="container-fluid" style="margin: 0px; padding: 0px;">
 
-                  <li class="media">
-                    <a class="pull-left" href="#">
-                        {% if lista.simbolo %}
-                            <img class="media-object img-responsive img-circle" width="40px" src="{{ MEDIA_URL }}{{ lista.simbolo }}" alt=""/>
-                        {% else %}
-                            <img class="media-object img-responsive img-circle" width="40px" src="{{ MEDIA_URL }}images/default.gif" alt=""/>
-                        {% endif %}
-                    </a>
-                    <div class="media-body">
-                      <h4 class="media-heading">{{ lista|upper }} <strong>{{ perc }}%</strong></h4>
-                    <div class="progress small">
-                      <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ perc }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ perc }}%;">
-                          {{ perc }}%
-                      </div>
-                    </div>
-                    </div>
-                  </li>
 
-                {% endwith %}
-                {% endwith %}
-            {% endfor %}
-            </ul>
-        </td>
-    </tr>
-    {% endfor %}
+
+    {% with proiezione=elezione.proiezioni.all.last %}
+    <div class="row">
+        <div class="col-md-12">
+            <span>COPERTURA CAMPIONE: <b>{% widthratio proiezione.copertura 1 100%}%</b><span>
+
+            <span class="pull-right text-muted">
+                Dati aggiornati alle</i>: {{ proiezione.data_creazione|date:'G:i' }} <small>({{ proiezione.data_creazione|naturaltime }}</small>)
+            </span>
+        </div>
+    </div>
+    <div class="row" style="padding-top: 20px;">
+    <div class="col-md-12">
+        <table class="table table-bordered table-condensed">
+        {% for lista in proiezione.liste.all %}
+            <tr>
+                <td>
+                    <img src="{{ MEDIA_URL }}{{ lista.lista.simbolo|default:"images/default.gif" }}" alt="..." class="img-responsive img-circle" style="width: 50px; height: 50px;">
+                </td>
+                <td>
+                        <span class="h4">{{ lista.lista.nome|upper }}</span>
+                </td>
+                <td class="text-center" style="font-size: 80%">
+
+                            {% with voti=lista.voti %}
+                            <h2 class="" style="margin: 0">{{ voti|floatformat:1 }}<small>%</small></h2>
+                            {% with forbice=lista.forbice %}
+                            <p class="" style="font-size: 85%">
+                                {{ forbice|forbice_inf_of:voti|floatformat:1 }}<small class="text-muted">%</small> –
+                                {{ forbice|forbice_sup_of:voti|floatformat:1 }}<small class="text-muted">%</small>
+                            </p>
+                            {% endwith %}
+                        {% endwith %}
+                </td>
+            </tr>
+
+        {% endfor %}
+        </table>
+    </div>
+    </div>
+
     {% endwith %}
-</table>
+    </div>
 {% endblock %}
+
+
+        {% comment %}
+        <h4>Liste</h4>
+        <ul>
+            {% for lista in proiezione.liste.all %}
+            <li>{{ lista.lista|upper }}
+                <strong>{{ lista.voti }}</strong>%
+                <small>
+                <{{ lista.forbice|forbice_inf_of:lista.voti }}<small class="text-muted">%</small>
+                –
+                {{ lista.forbice|forbice_sup_of:lista.voti }}<small class="text-muted">%</small>>
+                <<strong class="text-muted">{{ lista.forbice }}</strong>%>
+                </small>
+            </li>
+            {% endfor %}
+        <ul>
+        {% endcomment %}

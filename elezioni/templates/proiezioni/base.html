@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Proiezioni{% endblock %}
+{% block title %}Proiezioni – {{ elezione }}{% endblock %}
 
-{% block brand %}Proiezioni{% endblock %}
+{% block brand %}Proiezioni {% endblock %}
 
 {% block navmenu %}
 <li class="dropdown-header">Proiezioni</li>
@@ -11,6 +11,15 @@
 {% endblock %}
 
 {% block content %}
+    <span id="elezione" data-id="{{ elezione.id }}"></span>
+    <span id="proiezione" data-id="{{ elezione.proiezioni.last.id }}"></span>
+    <div id="alert" class="alert alert-success hidden" role="alert">
+      <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Una nuova <b>proiezione</b> è disponibile! Per visualizzarla clicca <a href="#" class="alert-link">qui</a>.
+        <button type="button" class="close" data-dismiss="alert">
+          <span aria-hidden="true">&times;</span>
+          <span class="sr-only">Close</span>
+        </button>
+    </div>
     <div class="row">
         <div class="col-md-8">
             {% block proiezione %}
@@ -22,4 +31,35 @@
             {% endblock %}
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+<script type="text/javascript">
+
+(function worker() {
+  $.ajax({
+    url: '/elezioni/check',
+    data: {
+        //csrfmiddlewaretoken: '{{ csrf_token }}',
+        //'id': me.data( "vid" ), // from form
+        'id': $('#elezione').data('id')
+
+    },
+    success: function(data) {
+      $('.result').html(data);
+        pid = parseInt($('#proiezione').data('id'));
+        console.log(pid);
+        if (parseInt(data) != pid) {
+            console.log('Nuova proiezione')
+            $("#alert").removeClass('hidden');
+        }
+    },
+    complete: function() {
+      // Schedule the next request when the current one's complete
+      setTimeout(worker, 4000);
+    }
+  });
+})();
+
+</script>
 {% endblock %}

@@ -1,17 +1,26 @@
+# -*- coding: utf-8 -*-
 from django.db import models
-from django.db.models import Sum, Max
+from django.db.models import Q, Sum, Max
 from math import sqrt
 from django.core import serializers
 from django.core import urlresolvers
+from datetime import datetime
 
+import config
+
+from django.contrib.auth.models import User
 from ProiezioniElezioni import settings
-from utenti.models import Rilevatore
 
 def _get_admin_url(self):
     return urlresolvers.reverse("admin:%s_%s_change" % (self._meta.app_label, self._meta.module_name), args=(self.id,))
 
 _get_admin_url.short_description = 'Operazioni'
 models.Model.get_admin_url = _get_admin_url
+
+
+class ElezioniAperteManager(models.Manager):
+    def get_queryset(self):
+        return super(ElezioniAperteManager, self).get_queryset().filter(chiusa=False)
 
 class Elezione(models.Model):
     titolo = models.CharField(max_length=255)
@@ -22,6 +31,12 @@ class Elezione(models.Model):
     copertura_simulata = models.PositiveIntegerField(default=0, help_text="Simula la copertura del campione. Se uguale a 0 (predefinito) la copertura e' uguale alla media delle coperture delle sezioni.")
     intervallo_ricalcolo = models.PositiveIntegerField(default=1)
 
+    ricercatori = models.ManyToManyField(User, related_name=config.RICERCATORI.lower(), limit_choices_to=Q(groups__name = config.RICERCATORI), blank=True, null=True)
+    emittenti = models.ManyToManyField(User, related_name=config.EMITTENTI.lower(), limit_choices_to=Q(groups__name = config.EMITTENTI), blank=True, null=True)
+
+    objects = models.Manager()
+    aperte = ElezioniAperteManager()
+
     def get_copertura_campione(self):
         if self.copertura_simulata != 0:
             return self.copertura_simulata*0.01
@@ -31,10 +46,13 @@ class Elezione(models.Model):
         )
 
         copertura = 0.0
-        for sezione in risultati_sezioni:
-            copertura += float(sezione.schede_valide + sezione.schede_nulle + sezione.schede_bianche)/sezione.votanti
+        try:
+            for sezione in risultati_sezioni:
+                copertura += float(sezione.schede_valide + sezione.schede_nulle + sezione.schede_bianche)/sezione.votanti
 
-        return copertura/risultati_sezioni.count()
+            return copertura/risultati_sezioni.count()
+        except:
+            return copertura
 
     def _pondera(self, cls):
         elemento = cls._meta.model_name
@@ -55,7 +73,10 @@ class Elezione(models.Model):
         for sezione in risultati_sezioni:
             schede_scrutinate = sezione.schede_valide + sezione.schede_nulle + sezione.schede_bianche
             _schede_scrutinate_ponderate = sezione.votanti * copertura_campione
-            _ponderazione = float(_schede_scrutinate_ponderate)/schede_scrutinate
+            try:
+                _ponderazione = float(_schede_scrutinate_ponderate)/schede_scrutinate
+            except:
+                _ponderazione = 0.0
             _valide = sezione.schede_valide*_ponderazione
 
             setattr(sezione, 'schede_nulle_mod_%s' % (elementi), round(sezione.schede_nulle * _ponderazione))
@@ -129,6 +150,7 @@ class Elezione(models.Model):
 
     class Meta:
         verbose_name_plural = "Elezioni"
+        permissions = config.DEFAULT_SYSTEM_PERMISSIONS
 
 class SezioniAttiveManager(models.Manager):
     def get_queryset(self):
@@ -152,7 +174,7 @@ class Sezione(models.Model):
     schede_nulle_mod_liste = models.PositiveIntegerField(default=0, editable=False)
     schede_bianche_mod_liste = models.PositiveIntegerField(default=0, editable=False)
 
-    rilevatore = models.ForeignKey(Rilevatore, related_name='sezioni', related_query_name='sezione', null=True, blank=True)
+    rilevatore = models.ForeignKey(User, limit_choices_to=Q(groups__name = 'Rilevatori'), null=True, blank=True)
 
     objects = models.Manager()
     attive = SezioniAttiveManager()
@@ -167,7 +189,7 @@ class Sezione(models.Model):
                 [VotiLista(lista=lista, sezione=self) for lista in self.elezione.liste.all()])
 
     def __str__(self):
-        return "%i %s" % (self.numero, self.nome)
+        return "Sezione n.%s %s" % (self.numero, self.nome)
 
     class Meta:
         ordering = ['numero']
@@ -280,11 +302,15 @@ class VotiLista(models.Model):
     class Meta:
         verbose_name_plural = "VotiLista"
 
-
 class Proiezione(models.Model):
     data_creazione = models.DateTimeField(auto_now_add=True)
     copertura = models.DecimalField(max_digits=4, decimal_places=3)
     elezione = models.ForeignKey(Elezione, related_name='proiezioni', related_query_name='proiezione')
+
+    pubblicata = models.BooleanField(default=False)
+    data_pubblicazione = models.DateTimeField(default=datetime.now)
+
+    modificatore_forbice = models.DecimalField(max_digits=3, decimal_places=2, default=1.00)
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None
@@ -313,7 +339,7 @@ class Proiezione(models.Model):
                 _totale_scrutinate_liste = totale_voti_liste + totali_candidati['nulle'] + totali_candidati['bianche']
 
             for i, candidato in enumerate(candidati):
-                _forbice = calcola_forbice(aventi_diritto_totali, _totale_scrutinate_candidati, candidato.voti_totali)
+                _forbice = calcola_forbice2(aventi_diritto_totali, _totale_scrutinate_candidati, candidato.voti_totali)
                 _voti_liste = totale_voti_liste_per_candidato[i]['voti_totali'] if totale_voti_liste_per_candidato else 0
                 _forbice_liste = calcola_forbice(aventi_diritto_totali, _totale_scrutinate_liste, _voti_liste) if liste else 0
                 _candidati.append(DatiProiezioneCandidato(candidato=candidato, proiezione=self,
@@ -337,6 +363,12 @@ class Proiezione(models.Model):
     def test(self):
         pass
 
+    def __str__(self):
+        return "Proeizione"
+
+    class Meta:
+        verbose_name_plural = "Proiezioni"
+
 class DatiProiezioneCandidato(models.Model):
     proiezione = models.ForeignKey(Proiezione, related_name='candidati', related_query_name='candidato')
     candidato = models.ForeignKey(Candidato)
@@ -345,6 +377,9 @@ class DatiProiezioneCandidato(models.Model):
     forbice = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
     forbice_liste = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
 
+    def get_forbice(self):
+        return self.forbice * self.proiezione.modificatore_forbice
+
 class DatiProiezioneLista(models.Model):
     proiezione = models.ForeignKey(Proiezione, related_name='liste', related_query_name='lista')
     lista = models.ForeignKey(Lista)
@@ -352,10 +387,57 @@ class DatiProiezioneLista(models.Model):
     forbice = models.DecimalField(max_digits=3, decimal_places=1, default=0.0)
 
 def calcola_forbice(aventi_diritto_totali, totale_voti_scrutinati, voti_totali_elemento):
-    percentuale_elemento = float(voti_totali_elemento)/totale_voti_scrutinati
+    #print "adt:%f / tvs: %f / vte: %f" % (aventi_diritto_totali, totale_voti_scrutinati, voti_totali_elemento)
+    try:
+        percentuale_elemento = float(voti_totali_elemento)/totale_voti_scrutinati
 
-    f = percentuale_elemento * float(1 - percentuale_elemento) / totale_voti_scrutinati
-    g = 1 - (float(totale_voti_scrutinati)/ aventi_diritto_totali )
+        f = percentuale_elemento * float(1 - percentuale_elemento) / totale_voti_scrutinati
+        g = 1 - (float(totale_voti_scrutinati)/ aventi_diritto_totali )
+    except ZeroDivisionError:
+        return 0
 
     percentile = 1.96 * sqrt(f) * sqrt(g)
     return percentile*100
+
+from decimal import Decimal
+
+def calcola_forbice2(aventi_diritto_totali, totale_voti_scrutinati, voti_totali_elemento):
+    _N = aventi_diritto_totali
+    _n = 5877
+
+
+    #print "adt:%f / tvs: %f / vte: %f" % (aventi_diritto_totali, totale_voti_scrutinati, voti_totali_elemento)
+    try:
+        _PGreco = float(voti_totali_elemento)/totale_voti_scrutinati
+        z = 1 - _PGreco
+        a =_PGreco * z
+        b = float(a)/_n
+        c = _N - _n
+        d = _N - 1
+        e = float(c) / d
+        f = float(b) * float(e)
+        g = sqrt(f)
+        h = g * 1.96
+
+        """
+        print "_Pgreco: %f" % (_PGreco)
+        print "_z: %s" % (z)
+        print "_a: %s" % (a)
+        print "_b: %s" % (b)
+        print "_c: %s" % (c)
+        print "_d: %s" % (d)
+        print "_e: %s" % (e)
+        print "_f: %s" % (f)
+        print "_g: %s" % (g)
+        print "_h: %s" % (h)
+        """
+
+        #percentuale_elemento = float(voti_totali_elemento)/totale_voti_scrutinati
+
+        #f = percentuale_elemento * float(1 - percentuale_elemento) / totale_voti_scrutinati
+        #g = 1 - (float(totale_voti_scrutinati)/ aventi_diritto_totali )
+    except ZeroDivisionError:
+        return 0
+
+    #percentile = 1.96 * sqrt(f) * sqrt(g)
+    return h*100

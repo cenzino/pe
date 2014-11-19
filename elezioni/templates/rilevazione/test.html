@@ -33,62 +33,84 @@ padding-left: 4px;
 
 </style>
 {% endblock %}
-{% block title %}Rilevazione Candidati{% endblock %}
+{% block title %}Rilevazione - {{ sezione }} – {{ sezione.elezione }}{% endblock %}
 
 {% block content %}
-
+{% if sezione.iscritti <= 0 or sezione.votanti <= 0 %}
+    <div class="alert alert-danger" role="alert">
+      <p><span class="h4">Attenzione!</span> Devi inserire i dati delle sezione.</p><br>
+      <a href="{% url 'edita_sezione' sezione.id %}" type="button" class="btn btn-danger btn-block btn-lg">Inserisci dati</a><a href="#" class="alert-link"></a>
+    </div>
+{% endif %}
 <!-- Tab panes -->
 <div class="tab-content">
   <div class="tab-pane active" id="candidati">
     <div class="container">
-      {% for v in sezione.voticandidato_set.all %}
-
-
-
-
-
         <div class="row" style="border-bottom: 1px solid #ddd;">
             <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 text-left">
-                {% if v.candidato.foto %}
-                    <img class="img-responsive" src="{{ MEDIA_URL }}{{ v.candidato.foto }}" alt=""/>
+                <img class="img-responsive" src="{{ MEDIA_URL }}images/scheda_bianca.png" alt=""/>
+            </div>
+            <div class="col-xs-2 col-sm-6 col-md-6 col-lg-7"><h5>BIANCHE</h5></div>
+            <div class="col-xs-3 col-sm-1 col-md-1 col-lg-1 text-right"><span id="schede-bianche" class="voti">{{ sezione.schede_bianche }}</span></div>
+
+            <div class="col-xs-5 col-sm-2 col-md-1 col-lg-1 text-right">
+                <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ sezione.id }}" class="btn btn-default btn-circle btn-lg bianche-decrementer">
+                  <span class="glyphicon glyphicon-minus"></span>
+                </button>
+                <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ sezione.id }}" class="btn btn-success btn-circle btn-xl bianche-incrementer">
+                  <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            </div>
+        </div>
+        <div class="row" style="border-bottom: 1px solid #ddd;">
+            <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 text-left">
+                <img class="img-responsive" src="{{ MEDIA_URL }}images/scheda_nulla.png" alt=""/>
+            </div>
+            <div class="col-xs-2 col-sm-6 col-md-6 col-lg-7"><h5>NULLE</h5></div>
+            <div class="col-xs-3 col-sm-1 col-md-1 col-lg-1 text-right"><span id="schede-nulle" class="voti">{{ sezione.schede_nulle }}</span></div>
+
+            <div class="col-xs-5 col-sm-2 col-md-1 col-lg-1 text-right">
+                <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ sezione.id }}" class="btn btn-default btn-circle btn-lg nulle-decrementer">
+                  <span class="glyphicon glyphicon-minus"></span>
+                </button>
+                <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ sezione.id }}" class="btn btn-success btn-circle btn-xl nulle-incrementer">
+                  <span class="glyphicon glyphicon-plus"></span>
+                </button>
+            </div>
+        </div>
+      {% for v in voti_candidato %}
+          {% with candidato=v.candidato %}
+        <div class="row" style="border-bottom: 1px solid #ddd;">
+            <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 text-left">
+                {% if candidato.foto %}
+                    <img class="img-responsive" src="{{ MEDIA_URL }}{{ candidato.foto }}" alt=""/>
                 {% else %}
                     <img class="img-responsive" src="{{ MEDIA_URL }}images/default.gif" alt=""/>
                 {% endif %}
             </div>
-            <div class="col-xs-2 col-sm-6 col-md-6 col-lg-7"><h5>{{ v.candidato.cognome|upper }}<p class="text-muted" style="font-size: small">{{ v.candidato.nome }}</p>
+            <div class="col-xs-2 col-sm-6 col-md-6 col-lg-7"><h5>{{ candidato.cognome|upper }}<p class="text-muted" style="font-size: small">{{ candidato.nome }}</p>
 
             </h5></div>
             <div class="col-xs-3 col-sm-1 col-md-1 col-lg-1 text-right"><span id="vc-{{ v.id }}-id" class="voti">{{ v.voti }}</span></div>
 
             <div class="col-xs-5 col-sm-2 col-md-1 col-lg-1 text-right">
-                {% comment %}
-                <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin fa-lg"></i>' data-vid="{{ v.id }}" class="btn btn-danger btn-circle btn-lg decrementer">
-                  <span class="glyphicon glyphicon-minus"></span>
-                </button>
-                {% endcomment %}
                 <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ v.id }}" class="btn btn-default btn-circle btn-lg decrementer">
                   <span class="glyphicon glyphicon-minus"></span>
                 </button>
                 <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ v.id }}" class="btn btn-success btn-circle btn-xl incrementer">
                   <span class="glyphicon glyphicon-plus"></span>
                 </button>
-                {% comment %}
-                <div class="btn-group btn-group">
-<a class="btn btn-danger btn-lg" href="{% url 'diminuisciVotoCandidato' v.id %}" role="button"><span class="glyphicon glyphicon-minus"></span></a>
-              <a class="btn btn-success btn-lg" href="{% url 'aumentaVotoCandidato' v.id %}" role="button"><span class="glyphicon glyphicon-plus"></span></a>
-
-                </div>
-                {% endcomment %}
             </div>
-
         </div>
-
+          {% endwith %}
       {% endfor %}
     </div>
   </div>
   <div class="tab-pane" id="liste">
     <div class="container">
-      {% for v in sezione.votilista_set.all %}
+
+      {% for v in voti_lista.all %}
+          {% with lista=v.lista %}
         <div class="row" style="border-bottom: 1px solid #ddd;">
             <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1">
                 {% if v.lista.simbolo %}
@@ -103,7 +125,6 @@ padding-left: 4px;
             <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 text-right"><span id="vl-{{ v.id }}-id" class="voti">{{ v.voti }}</span></div>
 
             <div class="col-xs-5 col-sm-2 col-md-2 col-lg-2 text-right">
-{#                <div class="btn-group btn-group">#}
 
                 <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ v.id }}" class="btn btn-default btn-circle btn-lg vl-decrementer">
                   <span class="glyphicon glyphicon-minus"></span>
@@ -112,15 +133,10 @@ padding-left: 4px;
                 <button type="button" id="loading-example-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ v.id }}" class="btn btn-success btn-circle btn-xl vl-incrementer">
                   <span class="glyphicon glyphicon-plus"></span>
                 </button>
-                    {% comment %}
-
-                    <a class="btn btn-danger btn-lg" href="{% url 'diminuisciVotoLista' v.id %}" role="button"><span class="glyphicon glyphicon-minus"></span></a>
-                    <a class="btn btn-success btn-lg" href="{% url 'aumentaVotoLista' v.id %}" role="button"><span class="glyphicon glyphicon-plus"></span></a>
-                    {% endcomment %}
-{#                </div>#}
             </div>
 
         </div>
+          {% endwith %}
 
       {% endfor %}
     </div>
@@ -134,6 +150,127 @@ padding-left: 4px;
 
 //var requestData = { 'ievent_id': type , 'channel_id': CHANNEL_ID , 'start_date': dateToStrConverter(start_date) , 'end_date': dateToStrConverter(end_date) };
 $(document).ready(function() {
+
+   $(".bianche-incrementer").click(function(event){
+       var me = $(this)
+       me.button('loading')
+       console.log(me.text());
+        $.ajax({
+             type: "POST",
+             url:"/elezioni/test_bianche",
+             data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    'vid': me.data( "vid" ), // from form
+                    'op': 'inc'
+
+                    },
+             success: function(data){
+                 // $('#message').html("<h2>Contact Form Submitted!</h2>")
+                 console.log('Success!'+data);
+                 me.button('reset');
+                 console.log('#vc-'+me.data('vid')+'-id');
+                 $('#schede-bianche').text(data);
+             },
+             error: function(){
+                 console.log('Errror!');
+                 me.button('reset')
+             }
+
+        });
+        return false; //<---- move it here
+   });
+
+
+   $(".bianche-decrementer").click(function(event){
+       var me = $(this)
+       me.button('loading')
+       console.log(me.text());
+        $.ajax({
+             type: "POST",
+             url:"/elezioni/test_bianche",
+             data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    'vid': me.data( "vid" ), // from form
+                    'op': 'dec'
+
+                    },
+             success: function(data){
+                 // $('#message').html("<h2>Contact Form Submitted!</h2>")
+                 console.log('Success!'+data);
+                 me.button('reset');
+                 console.log('#vc-'+me.data('vid')+'-id');
+                 $('#schede-bianche').text(data);
+             },
+             error: function(){
+                 console.log('Errror!');
+                 me.button('reset')
+             }
+
+        });
+        return false; //<---- move it here
+   });
+
+
+   $(".nulle-incrementer").click(function(event){
+       var me = $(this)
+       me.button('loading')
+       console.log(me.text());
+        $.ajax({
+             type: "POST",
+             url:"/elezioni/test_nulle",
+             data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    'vid': me.data( "vid" ), // from form
+                    'op': 'inc'
+
+                    },
+             success: function(data){
+                 // $('#message').html("<h2>Contact Form Submitted!</h2>")
+                 console.log('Success!'+data);
+                 me.button('reset');
+                 console.log('#vc-'+me.data('vid')+'-id');
+                 $('#schede-nulle').text(data);
+             },
+             error: function(){
+                 console.log('Errror!');
+                 me.button('reset')
+             }
+
+        });
+        return false; //<---- move it here
+   });
+
+
+   $(".nulle-decrementer").click(function(event){
+       var me = $(this)
+       me.button('loading')
+       console.log(me.text());
+        $.ajax({
+             type: "POST",
+             url:"/elezioni/test_nulle",
+             data: {
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                    'vid': me.data( "vid" ), // from form
+                    'op': 'dec'
+
+                    },
+             success: function(data){
+                 // $('#message').html("<h2>Contact Form Submitted!</h2>")
+                 console.log('Success!'+data);
+                 me.button('reset');
+                 console.log('#vc-'+me.data('vid')+'-id');
+                 $('#schede-nulle').text(data);
+             },
+             error: function(){
+                 console.log('Errror!');
+                 me.button('reset')
+             }
+
+        });
+        return false; //<---- move it here
+   });
+
+
    $(".incrementer").click(function(event){
        var me = $(this)
        me.button('loading')

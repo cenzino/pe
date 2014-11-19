@@ -2,6 +2,110 @@ from django.contrib import admin
 from .models import *
 from django.core import urlresolvers
 from django.utils.html import format_html
+from django.contrib.auth.admin import UserAdmin, GroupAdmin
+from django.contrib.auth.models import User, Group
+from django.db import transaction
+
+from django.utils.translation import ugettext_lazy as _
+import config
+
+"""
+class ProfiloInline(admin.StackedInline):
+    model = Profilo
+    can_delete = False
+    verbose_name_plural = 'Profilo utente'
+"""
+
+class UserAdmin(UserAdmin):
+    list_display = ('username', 'id', 'full_name', 'is_ricercatore', 'is_rilevatore', 'is_emittente', 'is_staff', 'is_active', 'is_superuser')
+    list_select_related = True
+    #inlines = (ProfiloInline, )
+    list_filter = ('is_staff',)
+
+    save_on_top = True
+
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
+        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',)}),
+        (_('Gruppi'), {'fields': ('groups', )}),
+        ('Permessi Avanzati', {
+            'classes': ('collapse', ),
+            'fields': ('user_permissions', )
+        }),
+        #(_('Important dates'), {'fields': ('last_login', 'date_joined')}),
+    )
+
+    def is_ricercatore(self, obj):
+        try:
+            return config.RICERCATORI in [g['name'] for g in obj.groups.values()]
+        except:
+            return False
+    is_ricercatore.short_description = 'Ricercatore'
+    is_ricercatore.boolean = True
+
+    def is_rilevatore(self, obj):
+        try:
+            return config.RILEVATORI in [g['name'] for g in obj.groups.values()]
+        except:
+            return False
+    is_rilevatore.short_description = 'Rilevatore'
+    is_rilevatore.boolean = True
+
+    def is_emittente(self, obj):
+        try:
+            return config.EMITTENTI in [g['name'] for g in obj.groups.values()]
+        except:
+            return False
+    is_emittente.short_description = 'Emittente'
+    is_emittente.boolean = True
+
+
+    def full_name(self, obj):
+        return obj.get_full_name()
+    full_name.short_description = "Nome completo"
+
+    list_filter += ('is_active', 'groups', )
+
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
+
+class GroupAdmin(GroupAdmin):
+    list_display = ('name', 'utenti', 'is_sistem_group' )
+
+    def is_sistem_group(self, obj):
+        return obj.name in config.DEFAULT_SYSTEM_GROUPS
+    is_sistem_group.short_description = "Gruppo di sistema (non cancellabile)"
+    is_sistem_group.boolean = True
+
+    def utenti(self, obj):
+        return User.objects.filter(groups__in=[obj,]).count()
+    utenti.short_description = "Numero utenti"
+
+    def get_actions(self, request):
+        #Disable delete
+        actions = super(GroupAdmin, self).get_actions(request)
+        del actions['delete_selected']
+        return actions
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(self.readonly_fields)
+        if obj.name in config.DEFAULT_SYSTEM_GROUPS:
+            print dir(obj)
+            readonly_fields.extend(['name','permissions'])
+        return readonly_fields
+
+    def has_delete_permission(self, request, obj=None):
+        try:
+            if obj.name in config.DEFAULT_SYSTEM_GROUPS:
+                return False
+        except:
+            return False
+        return True
+
+admin.site.unregister(Group)
+admin.site.register(Group, GroupAdmin)
+
 
 class SezioneInline(admin.TabularInline):
     model = Sezione
@@ -24,20 +128,32 @@ class CandidatoInline(admin.TabularInline):
     admin_url.allow_tags = True
     admin_url.short_description = 'Edita'
 
+"""
+class EmittenteInline(admin.TabularInline):
+    model = EmittenteElezione
+    extra = 0
+"""
 
 
 @admin.register(Elezione)
 class ElezioneAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'chiusa')
     fieldsets = (
         (None, {
             'fields': (('titolo', 'descrizione'), 'chiusa', 'aventi_diritto', 'copertura_simulata')}),
-        #('Ricercatori', {'fields': ('ricercatori',)}),
+        ('Ricercatori', {
+            'classes': (),
+            'fields': ('ricercatori', 'emittenti')
+        }),
     )
     inlines = [
+        #EmittenteInline,
         CandidatoInline,
         SezioneInline,
         #ListaInline
     ]
+
+    #filter_horizontal = ('ricercatori', )
 
     class Media:
         css = {
@@ -61,12 +177,14 @@ class VotiCandidatoAdmin(admin.ModelAdmin):
 #admin.site.register(VotiLista)
 
 class VotiCandidatoInline(admin.TabularInline):
-    list_display = ('sezione','candidato','voti')
+    list_display = ('id','sezione','candidato','voti')
     readonly_fields=('sezione','candidato',)
     fields = (('candidato', 'voti',),)
     model = VotiCandidato
     extra = 0
     list_filter = ('candidato',)
+
+    ordering = ['id',]
 
     actions = None
     def has_add_permission(self, request):
@@ -102,7 +220,6 @@ class SezioneAdmin(admin.ModelAdmin):
             "all": ("admin.css",)
         }
 
-
 @admin.register(Candidato)
 class CandidatoAdmin(admin.ModelAdmin):
     fieldsets = (
@@ -115,3 +232,63 @@ class CandidatoAdmin(admin.ModelAdmin):
         ListaInline,
     ]
 
+
+class DatiProiezioneCandidatoInline(admin.TabularInline):
+    model = DatiProiezioneCandidato
+    fields = ('candidato', 'voti','forbice', 'voti_liste', 'forbice_liste',)
+    list_display = ['candidato','voti',]
+    readonly_fields=('candidato',)
+    extra = 0
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None): # note the obj=None
+        return False
+
+    ordering = ['id',]
+
+
+    class Media:
+        css = {
+            "all": ("admin.css",)
+        }
+
+class DatiProiezioneListaInline(admin.TabularInline):
+    model = DatiProiezioneLista
+    fields = ('lista', 'voti', 'forbice')
+    #list_display = ['candidato','voti',]
+    readonly_fields=('lista',)
+    extra = 0
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None): # note the obj=None
+        return False
+
+    class Media:
+        css = {
+            "all": ("admin.css",)
+        }
+
+@admin.register(Proiezione)
+class ProiezioneAdmin(admin.ModelAdmin):
+    list_display = ('__str__', 'elezione', '_get_copertura', 'data_creazione', 'pubblicata')
+    readonly_fields=('elezione',)
+
+    inlines = [
+        DatiProiezioneCandidatoInline,
+        DatiProiezioneListaInline
+    ]
+
+    list_filter = ('elezione',)
+
+    def _get_copertura(self, obj):
+        return "%s %%" % (round(obj.copertura*100,1))
+    _get_copertura.short_description = "Copertura campione"
+
+
+@admin.register(Lista)
+class ListaAdmin(admin.ModelAdmin):
+    list_filter = ('elezione',)

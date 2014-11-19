@@ -19,20 +19,19 @@ urlpatterns = patterns('',
 
     url(r'^report/$', views.report_home, name='report_home'),
     url(r'^report/(?P<elezione_id>\d+)/candidati/$', views.report_candidati, {'ponderati': True }, name='report_candidati'),
-    url(r'^report/(?P<elezione_id>\d+)/liste/$', views.report_liste, name='report_liste'),
+    url(r'^report/(?P<elezione_id>\d+)/liste/$', views.report_liste, {'ponderati': True }, name='report_liste'),
+
+    url(r'^report/(?P<elezione_id>\d+)/candidati-dati/$', views.report_candidati, name='report_candidati_dati'),
+    url(r'^report/(?P<elezione_id>\d+)/liste-dati/$', views.report_liste, name='report_liste_dati'),
 
     url(r'^rilevazione/$', views.rilevazione_home, name='rilevazione_home'),
     url(r'^rilevazione/(?P<sezione_id>\d+)/$', views.rilevazione_index, name='rilevazione_index'),
-
     url(r'^rilevazione/(?P<sezione_id>\d+)/edita/$', views.edita_sezione, name='edita_sezione'),
-    url(r'^rilevazione/(?P<votocandidato_id>\d+)/aumentaC/$', views.aumentaVotoCandidato, name='aumentaVotoCandidato'),
-    url(r'^rilevazione/(?P<votocandidato_id>\d+)/diminuisciC/$', views.diminuisciVotoCandidato, name='diminuisciVotoCandidato'),
-    url(r'^rilevazione/(?P<votolista_id>\d+)/aumentaL/$', views.aumentaVotoLista, name='aumentaVotoLista'),
-    url(r'^rilevazione/(?P<votolista_id>\d+)/diminuisciL/$', views.diminuisciVotoLista, name='diminuisciVotoLista'),
-
-
 
     url(r'^test$', views.test, name='test'),
+    url(r'^test_bianche$', views.test_bianche, name='test_bianche'),
+    url(r'^test_nulle$', views.test_nulle, name='test_nulle'),
     url(r'^test2$', views.test2, name='test2'),
+    url(r'^check$', views.check_proiezione, name='check'),
 )# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

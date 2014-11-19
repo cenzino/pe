@@ -1,0 +1,25 @@
+{% extends "rilevazione/base.html" %}
+
+{% block custum_style %}
+
+{% endblock %}
+{% block title %}Rilevazione Candidati{% endblock %}
+
+{% block content %}
+
+    {% regroup sezioni|dictsort:"elezione_id"  by elezione as elezioni_list %}
+
+    <ul class="list-group list-unstyled">
+        {% for elezione in elezioni_list %}
+        <li class="list-group-item"><b>{{ elezione.grouper }}</b>
+            <ul>
+                {% for sez in elezione.list %}
+                  <li><b>{{ sez.nome }}</b> <i>{{ sez.rilevatore }}</i> <a href="{% url 'rilevazione_index' sez.id %}">Vai</a></li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% endfor %}
+    </ul>
+
+
+{% endblock %}

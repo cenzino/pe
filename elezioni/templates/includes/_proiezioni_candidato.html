@@ -1,18 +1,18 @@
 {% load eletags %}
-<div class="thumbnail">
+<div class="thumbnail" style="padding: 0; border: 0;">
     <img src="{{ MEDIA_URL }}{{ candidato.candidato.foto|default:"images/default.gif" }}" alt="..." class="img-responsive" style="width:100%">
 
     <div class="caption text-center"style="background-color: #111; color: #fff; ">
         <span class="h5">{{ candidato.candidato.cognome|upper }}</span>
     </div>
-    <div class="caption text-center" style="background-color: gold">
+    <div class="caption text-center" style="background-color: gold;">
             {% with voti=candidato.voti %}
-            <h1 class="" style="margin: 0">{{ voti|floatformat:1 }}<small>%</small></h1>
-            {% with forbice=candidato.forbice %}
-            <p class="" style="font-size: 85%">
+            <h1 class="" style="margin: 0; padding: 0; line-height: 1;">{{ voti|floatformat:1 }}<small>%</small></h1>
+            {% with forbice=candidato.get_forbice %}
+            <span class="" style="font-size: 95%">
                 {{ forbice|forbice_inf_of:voti|floatformat:1 }}<small class="text-muted">%</small> –
                 {{ forbice|forbice_sup_of:voti|floatformat:1 }}<small class="text-muted">%</small>
-            </p>
+            </span>
             {% endwith %}
         {% endwith %}
     </div>

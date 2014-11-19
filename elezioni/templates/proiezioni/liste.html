@@ -1,7 +1,7 @@
 {% extends "proiezioni/base.html" %}
 {% load eletags humanize %}
 
-{% block title %}Proiezioni Candidati{% endblock %}
+{% block title %}Proiezioni Liste – {{ elezione }}{% endblock %}
 {% block custum_style %}
 
 {% endblock %}
@@ -13,6 +13,7 @@
 
 
     {% with proiezione=elezione.proiezioni.all.last %}
+    {% if proiezione %}
     <div class="row">
         <div class="col-md-12">
             <span>COPERTURA CAMPIONE: <b>{% widthratio proiezione.copertura 1 100%}%</b><span>
@@ -50,6 +51,9 @@
         {% endfor %}
         </table>
     </div>
+    {% else %}
+        Al momento non ci sono proiezioni disponibili.
+    {% endif %}
     </div>
 
     {% endwith %}

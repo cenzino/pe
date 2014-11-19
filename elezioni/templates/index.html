@@ -4,13 +4,22 @@
 
 {% block content %}
     <h1>Elezioni</h1>
+
+    {% comment %}
     <table class="table table-bordered table-hover">
     {% for elezione in elezioni %}
     <tr>
         <td><h4>{{ elezione }}</h4></td>
         <td>
-            <a class="btn btn-default" href="{% url 'proiezioni_home' elezione.id %}">Proiezioni</a>
-            <a class="btn btn-default" href="{% url 'report_home' elezione.id %}">Report</a>
+            {% if perms.elezioni.can_view_projections %}
+                <a class="btn btn-default" href="{% url 'proiezioni_home' %}"> Vai alle Proiezioni</a>
+            {% endif %}
+            {% if perms.elezioni.can_view_reports %}
+                <a class="btn btn-default" href="{% url 'report_home' %}">Vai ai Report</a>
+            {% endif %}
+            {% if perms.elezioni.can_update_votes %}
+                <a class="btn btn-default" href="{% url 'rilevazione_home' %}">Rilevazione</a>
+            {% endif %}
 
             <div class="btn-group">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
@@ -26,4 +35,74 @@
     </tr>
     {% endfor %}
     </table>
+    {% endcomment %}
+    {% comment %}
+    {% for elezione in elezioni %}
+        <div class="panel panel-default">
+          <!-- Default panel contents -->
+          <div class="panel-heading">
+            <span class="h3">{{ elezione }}</span>
+            <div class="pull-right">
+            {% if perms.elezioni.can_view_projections %}
+                <a class="btn btn-default" href="{% url 'proiezioni_home' %}">Vai alle Proiezioni</a>
+            {% endif %}
+            {% if perms.elezioni.can_view_reports %}
+                <a class="btn btn-default" href="{% url 'report_home' %}">Vai ai Report</a>
+            {% endif %}
+            </div>
+          </div>
+            {% if perms.elezioni.can_update_votes %}
+                <a class="btn btn-default" href="{% url 'rilevazione_home' %}">Rilevazione</a>
+            {% endif %}
+
+          <ul class="list-group">
+            {% for sezione in elezione.sezioni.all %}
+                <a href="{% url 'rilevazione_index' sezione.id %}" class="list-group-item">
+                    <strong>{{ sezione }}</strong>
+                    <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span>
+                </a>
+            {% endfor %}
+          </ul>
+        </div>
+    {% endfor %}
+    {% endcomment %}
+
+    <div class="panel panel-default">
+    {% for elezione in elezioni %}<!-- Default panel contents -->
+          <div class="panel-heading">
+            <div class="panel-title">
+                <b>{{ elezione }}</b>
+                <ul class="list-inline pull-right">
+                {% if perms.elezioni.can_view_projections %}
+                    <li><a class="" href="{% url 'proiezioni_candidati' elezione.id %}">Proiezioni</a></li>
+                {% endif %}
+                {% if perms.elezioni.can_view_reports %}
+                    <li><a class="" href="{% url 'report_candidati' elezione.id %}">Reports</a></li>
+                {% endif %}
+                </ul>
+            </div>
+          </div>
+            {% if perms.elezioni.can_update_votes %}
+              <ul class="list-group">
+                {% for sezione in elezione.sezioni.all %}
+                    {% if is_rilevatore %}
+                        {%if sezione.rilevatore == user %}
+                        <a href="{% url 'rilevazione_index' sezione.id %}" class="list-group-item">
+                            <strong>{{ sezione }}</strong>
+                            <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span>
+                        </a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'rilevazione_index' sezione.id %}" class="list-group-item">
+                            <strong>{{ sezione }}</strong>
+                            <span class="glyphicon glyphicon-chevron-right pull-right" aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+              </ul>
+            {% endif %}
+
+
+    {% endfor %}
+    </div>
 {% endblock %}

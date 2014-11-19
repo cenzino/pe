@@ -1,21 +1,27 @@
 {% extends "rilevazione/base.html" %}
+{% load bootstrap %}
+
 
 {% block custum_style %}
-<style>
-body {
-    padding-top: 60px;
-    font-family: 'Roboto Condensed', sans-serif;
-}
-</style>
+    <style>
+        body { margin-top: 40px; }
+    </style>
 {% endblock %}
+
 {% block title %}Edita sezione{% endblock %}
 
+{% block inner_nav %}{% endblock %}
+
 {% block content %}
-<h1>Inserisci i dati della sezione</h1>
+<h3>Inserisci i dati della sezione</h3>
 
 <form action="{% url 'edita_sezione' sezione.id %}" method="post">
     {% csrf_token %}
-    {{ form }}
-    <input type="submit" value="Submit" />
+    {{ form|bootstrap }}
+    <button class="btn btn-lg btn-success btn-block" type="submit">Salva</button>
 </form>
+<br>
+<a href="{% url 'rilevazione_index' sezione.id %}" class="btn btn-lg btn-primary btn-block" type="submit">Ritorna alla Rilevazione</a>
 {% endblock %}
+
+{% block scripts %}{% endblock %}

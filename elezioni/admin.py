@@ -91,7 +91,7 @@ class GroupAdmin(GroupAdmin):
     def get_readonly_fields(self, request, obj=None):
         readonly_fields = list(self.readonly_fields)
         if obj.name in config.DEFAULT_SYSTEM_GROUPS:
-            print dir(obj)
+            #print dir(obj)
             readonly_fields.extend(['name','permissions'])
         return readonly_fields
 
@@ -110,6 +110,7 @@ admin.site.register(Group, GroupAdmin)
 class SezioneInline(admin.TabularInline):
     model = Sezione
     extra = 0
+    exclude = ['luogo',]
 
 class ListaInline(admin.TabularInline):
     model = Lista

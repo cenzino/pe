@@ -67,7 +67,7 @@ class Elezione(models.Model):
         risultati_sezioni = Sezione.attive.filter(elezione_id=self.id).select_related('voti%(elemento)s_set').annotate(
             schede_valide=Sum('voti%s__voti' % (elemento))
         )
-        print risultati_sezioni.values('numero','attiva')
+        #print risultati_sezioni.values('numero','attiva')
 
         for sezione in risultati_sezioni:
             schede_scrutinate = sezione.schede_valide + sezione.schede_nulle + sezione.schede_bianche
@@ -113,8 +113,8 @@ class Elezione(models.Model):
         risultati_sezioni = Sezione.attive.filter(elezione_id=self.id).select_related('voti%(elemento)s_set').annotate(
             schede_valide=Sum('voti%s__voti%s' % (elemento, tipo))
         )
-        print "*"*20
-        print risultati_sezioni.values('numero','attiva')
+        #print "*"*20
+        #print risultati_sezioni.values('numero','attiva')
 
         for sezione in risultati_sezioni:
             sezione.schede_nulle = getattr(sezione, "schede_nulle%s" % (elementi_tipo))
@@ -141,7 +141,7 @@ class Elezione(models.Model):
 
             }
         }
-        print risultati['totali']
+        #print risultati['totali']
         return risultati
 
     def __str__(self):

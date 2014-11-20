@@ -64,9 +64,9 @@ TEMPLATE_CONTEXT_PROCESSORS = TCP + (
     'django.core.context_processors.request',
 )
 
-ROOT_URLCONF = 'ProiezioniElezioni.urls'
+ROOT_URLCONF = 'proiezioni.urls'
 
-WSGI_APPLICATION = 'ProiezioniElezioni.wsgi.application'
+WSGI_APPLICATION = 'proiezioni.wsgi.application'
 
 
 # Database

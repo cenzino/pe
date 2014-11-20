@@ -89,7 +89,7 @@
         <div class="col-sm-6 col-md-4 col-md-offset-4">
             <h1 class="text-center login-title">Inserisci i tuoi dati per accedere al Sistema</h1>
             <div class="account-wall">
-                <img class="profile-img" src="{{ MEDIA_URL }}images/user.png" alt="">
+                <img class="profile-img" src="{{ MEDIA_URL }}../../static/images/user.png" alt="">
                 <form action="" class="form-signin" method="post" role="form">
                     {% csrf_token %}
                     {% if form.non_field_errors %}

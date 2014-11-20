@@ -1,6 +1,6 @@
 {% load eletags %}
 
-<td>{{ sezione.numero }}</td>
+<td class="text-left">{{ sezione.numero }}{{ sezione.nome }}</td>
 <td>{{ sezione.iscritti }}</td>
 <td>{{ sezione.votanti }}</td>
 {% with schede_scrutinate=sezione.schede_valide|add:sezione.schede_bianche|add:sezione.schede_nulle %}

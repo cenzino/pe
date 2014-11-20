@@ -21,21 +21,21 @@ def has_only_perm(user, perm_name):
 def home(request):
     user = request.user
 
-    print "* "*10
-    print set(config.DEFAULT_SYSTEM_PERMISSIONS_NAME).intersection(user.get_all_permissions())
+    #print "* "*10
+    #print set(config.DEFAULT_SYSTEM_PERMISSIONS_NAME).intersection(user.get_all_permissions())
 
     if user.is_superuser:
         return render(request, 'index.html', { 'elezioni': Elezione.objects.all() })
 
     if set(config.DEFAULT_SYSTEM_PERMISSIONS_NAME).intersection(user.get_all_permissions()):
         if is_member_of(user, config.RICERCATORI) or has_only_perm(user, config.CAN_VIEW_REPORTS[0]):
-            print "E' un ricercatore"
+            #print "E' un ricercatore"
             return redirect('report_home')
         elif is_member_of(user, config.RILEVATORI) or has_only_perm(user, config.CAN_UPDATE_VOTES[0]):
-            print "E' un rilevatore"
+            #print "E' un rilevatore"
             return redirect('rilevazione_home')
         elif is_member_of(user, config.EMITTENTI) or has_only_perm(user, config.CAN_VIEW_PROJECTIONS[0]):
-            print "E' un emittente"
+            #print "E' un emittente"
             return redirect('proiezioni_home')
         return render(request, 'index.html', { 'elezioni': Elezione.objects.all() })
 
@@ -280,6 +280,8 @@ def crea_proiezione(request, elezione_id):
 @transaction.atomic
 def report_candidati(request, elezione_id, ponderati=False):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
+
+
 
     return render(request, 'report/report.html', { 'elezione': elezione, 'risultati': elezione.get_risultati(Candidato, ponderati)})
 

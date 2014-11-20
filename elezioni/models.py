@@ -9,7 +9,6 @@ from datetime import datetime
 import config
 
 from django.contrib.auth.models import User
-from ProiezioniElezioni import settings
 
 def _get_admin_url(self):
     return urlresolvers.reverse("admin:%s_%s_change" % (self._meta.app_label, self._meta.module_name), args=(self.id,))
@@ -205,7 +204,7 @@ def _generate_new_filename(instance, filename):
 
 
 def _get_image_path(instance, filename):
-    return '{}elezione-{}/{}/{}'.format(settings.UPLOAD_IMG_PATH, instance.elezione.pk, instance.__class__.__name__.lower(),filename)
+    return '{}elezione-{}/{}/{}'.format(config.UPLOAD_IMG_PATH, instance.elezione.pk, instance.__class__.__name__.lower(),filename)
 
 get_image_path = _get_image_path
 

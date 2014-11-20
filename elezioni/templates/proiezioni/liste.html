@@ -16,7 +16,7 @@
     {% if proiezione %}
     <div class="row">
         <div class="col-md-12">
-            <span>COPERTURA CAMPIONE: <b>{% widthratio proiezione.copertura 1 100%}%</b><span>
+            <span>COPERTURA CAMPIONE: <b>{% widthratio proiezione.copertura 1 100%}%</b></span>
 
             <span class="pull-right text-muted">
                 Dati aggiornati alle</i>: {{ proiezione.data_creazione|date:'G:i' }} <small>({{ proiezione.data_creazione|naturaltime }}</small>)

@@ -32,7 +32,6 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
-    #'grappelli',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +42,6 @@ INSTALLED_APPS = (
     'debug_toolbar.apps.DebugToolbarConfig',
     'bootstrapform',
     'elezioni',
-    'custom',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -115,7 +113,6 @@ PROJECT_PATH = os.path.abspath(PROJECT_PATH)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media') # Absolute path to the media directory
 
-UPLOAD_IMG_PATH = 'upload/images/'
 LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'

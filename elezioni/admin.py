@@ -16,6 +16,11 @@ class ProfiloInline(admin.StackedInline):
     verbose_name_plural = 'Profilo utente'
 """
 
+class InfoUtenteInline(admin.StackedInline):
+    model = InfoUtente
+    can_delete = False
+    verbose_name_plural = 'Informazioni Utenti'
+
 class UserAdmin(UserAdmin):
     list_display = ('username', 'id', 'full_name', 'is_ricercatore', 'is_rilevatore', 'is_emittente', 'is_staff', 'is_active', 'is_superuser')
     list_select_related = True
@@ -27,14 +32,20 @@ class UserAdmin(UserAdmin):
     fieldsets = (
         (None, {'fields': ('username', 'password')}),
         (_('Personal info'), {'fields': ('first_name', 'last_name', 'email')}),
-        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser',)}),
-        (_('Gruppi'), {'fields': ('groups', )}),
+        (_('Permissions'), {
+            'classes': ('collapse', ),
+            'fields': ('is_active', 'is_staff', 'is_superuser',)}),
+        (_('Gruppi'), {
+            'classes': ('collapse', ),
+            'fields': ('groups', )}),
         ('Permessi Avanzati', {
             'classes': ('collapse', ),
             'fields': ('user_permissions', )
         }),
         #(_('Important dates'), {'fields': ('last_login', 'date_joined')}),
     )
+
+    inlines = (InfoUtenteInline, )
 
     def is_ricercatore(self, obj):
         try:
@@ -72,6 +83,7 @@ admin.site.register(User, UserAdmin)
 
 class GroupAdmin(GroupAdmin):
     list_display = ('name', 'utenti', 'is_sistem_group' )
+    filter_horizontal = ('permissions',)
 
     def is_sistem_group(self, obj):
         return obj.name in config.DEFAULT_SYSTEM_GROUPS
@@ -163,7 +175,7 @@ class ElezioneAdmin(admin.ModelAdmin):
 
 #@admin.register(VotiCandidato)
 class VotiCandidatoAdmin(admin.ModelAdmin):
-    list_display = ('sezione','candidato','voti')
+    list_display = ('sezione','candidato','voti','updated_at')
     readonly_fields=('sezione','candidato',)
     list_filter = ('candidato',)
     actions = None
@@ -179,8 +191,8 @@ class VotiCandidatoAdmin(admin.ModelAdmin):
 
 class VotiCandidatoInline(admin.TabularInline):
     list_display = ('id','sezione','candidato','voti')
-    readonly_fields=('sezione','candidato',)
-    fields = (('candidato', 'voti',),)
+    readonly_fields=('sezione','candidato', 'ultimo_aggiornamento', )
+    fields = (('candidato', 'voti', 'ultimo_aggiornamento',),)
     model = VotiCandidato
     extra = 0
     list_filter = ('candidato',)
@@ -196,8 +208,8 @@ class VotiCandidatoInline(admin.TabularInline):
 
 class VotiListaInline(admin.TabularInline):
     list_display = ('sezione','lista','voti')
-    readonly_fields=('sezione','lista',)
-    fields = ('lista', 'voti',)
+    readonly_fields=('sezione','lista', 'ultimo_aggiornamento', )
+    fields = ('lista', 'voti', 'ultimo_aggiornamento',)
     model = VotiLista
     extra = 0
 
@@ -275,7 +287,7 @@ class DatiProiezioneListaInline(admin.TabularInline):
 
 @admin.register(Proiezione)
 class ProiezioneAdmin(admin.ModelAdmin):
-    list_display = ('__str__', 'elezione', '_get_copertura', 'data_creazione', 'pubblicata')
+    list_display = ('__str__', 'elezione', '_get_copertura', 'data_creazione', 'pubblicata','generata_da_riserve')
     readonly_fields=('elezione',)
 
     inlines = [

@@ -5,6 +5,7 @@ from math import sqrt
 from django.core import serializers
 from django.core import urlresolvers
 from datetime import datetime
+from django.core.validators import RegexValidator
 
 import config
 
@@ -15,6 +16,19 @@ def _get_admin_url(self):
 
 _get_admin_url.short_description = 'Operazioni'
 models.Model.get_admin_url = _get_admin_url
+
+
+class InfoUtente(models.Model):
+    user = models.OneToOneField(User)
+    telefono_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Il numero di telefono deve essere in questo formato: '+1234567890'. Fino a un massimo di 15 cifre.")
+    telefono= models.CharField(validators=[telefono_regex,], max_length=15, blank=True, null=True)
+    telefono2 = models.CharField(validators=[telefono_regex,], max_length=15, blank=True, null=True)
+
+    note = models.TextField(blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "ProfiloUtente"
+
 
 
 class ElezioniAperteManager(models.Manager):
@@ -282,6 +296,8 @@ class VotiCandidato(models.Model):
     voti = models.IntegerField(default=0)
     voti_mod = models.IntegerField(default=0, editable=False)
 
+    ultimo_aggiornamento = models.DateTimeField(blank=True, null=True)
+
     def __str__(self):
         return "%s - %s" % (self.candidato, self.sezione)
 
@@ -294,6 +310,8 @@ class VotiLista(models.Model):
     sezione = models.ForeignKey(Sezione)
     voti = models.IntegerField(default=0)
     voti_mod = models.IntegerField(default=0, editable=False)
+
+    ultimo_aggiornamento = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return "%s - %s" % (self.lista, self.sezione)
@@ -310,6 +328,8 @@ class Proiezione(models.Model):
     data_pubblicazione = models.DateTimeField(default=datetime.now)
 
     modificatore_forbice = models.DecimalField(max_digits=3, decimal_places=2, default=1.00)
+
+    generata_da_riserve = models.BooleanField(default=False, editable=False)
 
     def save(self, *args, **kwargs):
         is_new = self.pk is None

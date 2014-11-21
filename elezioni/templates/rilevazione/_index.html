@@ -43,7 +43,7 @@ padding-left: 4px;
                 {% if v.candidato.foto %}
                     <img class="img-responsive" src="{{ MEDIA_URL }}{{ v.candidato.foto }}" alt=""/>
                 {% else %}
-                    <img class="img-responsive" src="{{ MEDIA_URL }}../../../static/images/default.gif" alt=""/>
+                    <img class="img-responsive" src="{% static "images/default.gif" %}" alt=""/>
                 {% endif %}
             </div>
             <div class="col-xs-3 col-sm-8 col-md-8 col-lg-8"><h5>{{ v.candidato.cognome|upper }}<p class="text-muted" style="font-size: small">{{ v.candidato.nome }}</p>
@@ -72,7 +72,7 @@ padding-left: 4px;
                 {% if v.lista.simbolo %}
                     <img class="img-responsive" src="{{ MEDIA_URL }}{{ v.lista.simbolo }}" alt=""/>
                 {% else %}
-                    <img class="img-responsive" src="{{ MEDIA_URL }}../../../static/images/default.gif" alt=""/>
+                    <img class="img-responsive" src="{% static "images/default.gif" %}" alt=""/>
                 {% endif %}
             </div>
             <div class="col-xs-3 col-sm-8 col-md-8 col-lg-8"><h5>{{ v.lista.nome|upper }}<p class="text-muted text-nowrap" style="font-size: small; font-weight: 400; margin-top:2px">{{ v.lista.candidato.cognome|upper }}</p>

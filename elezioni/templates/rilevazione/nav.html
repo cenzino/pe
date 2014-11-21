@@ -9,7 +9,7 @@
         <span class="icon-bar"></span>
       </button>
       <a class="navbar-brand" href="{% url 'home' %}">
-          <img src="{{ MEDIA_URL }}../../../static/images/demoskopika-logo-small.png" alt="" class="" style="width: 65px; padding: 0px; margin-top: -13px; margin-left: -10px;"/> {% block brand %}{% endblock %}
+          <img src="{% static "images/demoskopika-logo-small.png" %}" alt="" class="" style="width: 65px; padding: 0px; margin-top: -13px; margin-left: -10px;"/> {% block brand %}{% endblock %}
       </a>
     </div>
     <div class="navbar-collapse collapse">

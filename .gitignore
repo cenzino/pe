@@ -2,4 +2,3 @@
 *.sqlite3
 media/upload/
 elezioni/migrations/
-.idea/

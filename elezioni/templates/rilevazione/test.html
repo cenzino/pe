@@ -48,7 +48,7 @@ padding-left: 4px;
     <div class="container">
         <div class="row" style="border-bottom: 1px solid #ddd;">
             <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 text-left">
-                <img class="img-responsive" src="{{ MEDIA_URL }}../../../static/images/scheda_bianca.png" alt=""/>
+                <img class="img-responsive" src="{% static "images/scheda_bianca.png" %}" alt=""/>
             </div>
             <div class="col-xs-2 col-sm-6 col-md-6 col-lg-7"><h5>BIANCHE</h5></div>
             <div class="col-xs-3 col-sm-1 col-md-1 col-lg-1 text-right"><span id="schede-bianche" class="voti">{{ sezione.schede_bianche }}</span></div>
@@ -64,7 +64,7 @@ padding-left: 4px;
         </div>
         <div class="row" style="border-bottom: 1px solid #ddd;">
             <div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 text-left">
-                <img class="img-responsive" src="{{ MEDIA_URL }}../../../static/images/scheda_nulla.png" alt=""/>
+                <img class="img-responsive" src="{% static "images/scheda_nulla.png" %}" alt=""/>
             </div>
             <div class="col-xs-2 col-sm-6 col-md-6 col-lg-7"><h5>NULLE</h5></div>
             <div class="col-xs-3 col-sm-1 col-md-1 col-lg-1 text-right"><span id="schede-nulle" class="voti">{{ sezione.schede_nulle }}</span></div>
@@ -85,7 +85,7 @@ padding-left: 4px;
                 {% if candidato.foto %}
                     <img class="img-responsive" src="{{ MEDIA_URL }}{{ candidato.foto }}" alt=""/>
                 {% else %}
-                    <img class="img-responsive" src="{{ MEDIA_URL }}../../../static/images/default.gif" alt=""/>
+                    <img class="img-responsive" src="{% static "images/default.gif" %}" alt=""/>
                 {% endif %}
             </div>
             <div class="col-xs-2 col-sm-6 col-md-6 col-lg-7"><h5>{{ candidato.cognome|upper }}<p class="text-muted" style="font-size: small">{{ candidato.nome }}</p>
@@ -116,7 +116,7 @@ padding-left: 4px;
                 {% if v.lista.simbolo %}
                     <img class="img-responsive" src="{{ MEDIA_URL }}{{ v.lista.simbolo }}" alt=""/>
                 {% else %}
-                    <img class="img-responsive" src="{{ MEDIA_URL }}../../../static/images/default.gif" alt=""/>
+                    <img class="img-responsive" src="{% static "images/default.gif" %}" alt=""/>
                 {% endif %}
             </div>
             <div class="col-xs-3 col-sm-8 col-md-8 col-lg-8"><h5>{{ v.lista.nome|upper }}<p class="text-muted text-nowrap" style="font-size: small; font-weight: 400; margin-top:2px">{{ v.lista.candidato.cognome|upper }}</p>

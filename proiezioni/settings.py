@@ -115,7 +115,11 @@ if LIVEHOST:
     DEBUG = False
     TEMPLATE_DEBUG = False
 
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = [
+        'proiezioni.tiesi.webfactional.com',
+        'ex.proiezioni.tiesi.webfactional.com',
+        'px.proiezioni.tiesi.webfactional.com',
+    ]
 
     DATABASES = {
         'default': {

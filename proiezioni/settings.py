@@ -135,7 +135,8 @@ if LIVEHOST:
     STATIC_URL = '/static/'
     STATIC_ROOT = '/home/tiesi/webapps/proiezioni_static/'
     MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
+    MEDIA_ROOT = '/home/tiesi/webapps/proiezioni_media/'
+    #MEDIA_ROOT = os.path.join(PROJECT_PATH, 'media')
 else:
     """
     Configurazione di Sviluppo

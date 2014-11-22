@@ -16,6 +16,14 @@ class ProfiloInline(admin.StackedInline):
     verbose_name_plural = 'Profilo utente'
 """
 
+def make_active(modeladmin, request, queryset):
+    queryset.filter(is_superuser=False).update(is_active=True)
+make_active.short_description = "Attiva utenti selezioni/e"
+
+def make_inactive(modeladmin, request, queryset):
+    queryset.filter(is_superuser=False).update(is_active=False)
+make_inactive.short_description = "Disattiva utenti selezioni/e"
+
 class InfoUtenteInline(admin.StackedInline):
     model = InfoUtente
     can_delete = False
@@ -77,6 +85,8 @@ class UserAdmin(UserAdmin):
     full_name.short_description = "Nome completo"
 
     list_filter += ('is_active', 'groups', )
+
+    actions = [make_active, make_inactive]
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)

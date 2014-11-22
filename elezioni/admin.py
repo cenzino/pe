@@ -18,11 +18,11 @@ class ProfiloInline(admin.StackedInline):
 
 def make_active(modeladmin, request, queryset):
     queryset.filter(is_superuser=False).update(is_active=True)
-make_active.short_description = "Attiva utenti selezioni/e"
+make_active.short_description = "Attiva utenti selezionati/e"
 
 def make_inactive(modeladmin, request, queryset):
     queryset.filter(is_superuser=False).update(is_active=False)
-make_inactive.short_description = "Disattiva utenti selezioni/e"
+make_inactive.short_description = "Disattiva utenti selezionati/e"
 
 class InfoUtenteInline(admin.StackedInline):
     model = InfoUtente
@@ -132,7 +132,7 @@ admin.site.register(Group, GroupAdmin)
 class SezioneInline(admin.TabularInline):
     model = Sezione
     extra = 0
-    exclude = ['luogo',]
+    exclude = []
 
 class ListaInline(admin.TabularInline):
     model = Lista
@@ -157,6 +157,13 @@ class EmittenteInline(admin.TabularInline):
     extra = 0
 """
 
+class ProiezioneInline(admin.TabularInline):
+    model = Proiezione
+    extra = 0
+
+    def has_add_permission(self, request):
+        return False
+
 
 @admin.register(Elezione)
 class ElezioneAdmin(admin.ModelAdmin):
@@ -164,19 +171,20 @@ class ElezioneAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {
             'fields': (('titolo', 'descrizione'), 'chiusa', 'aventi_diritto', 'copertura_simulata')}),
-        ('Ricercatori', {
-            'classes': (),
+        ('Utenti', {
+            'classes': ('collapse', ),
             'fields': ('ricercatori', 'emittenti')
         }),
     )
     inlines = [
-        #EmittenteInline,
+        ProiezioneInline,
         CandidatoInline,
         SezioneInline,
-        #ListaInline
     ]
 
-    #filter_horizontal = ('ricercatori', )
+    filter_horizontal = ('ricercatori', 'emittenti', )
+
+    save_on_top = True
 
     class Media:
         css = {

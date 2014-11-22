@@ -9,18 +9,18 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url 'home' %}">
-          <img src="{% static "images/demoskopika-logo-small.png" %}" alt="" class="" style="width: 65px; padding: 0px; margin-top: -13px; margin-left: -10px;"/> {% block brand %}{% endblock %}
+      <a class="navbar-brand" href="{% url 'rilevazione_index' sezione.id%}">
+          <img src="{% static "images/demoskopika-logo-small.png" %}" alt="" class="" style="width: 50px; padding: 0px; margin-top: -10px; margin-left: -10px;"/> {% block brand %}{% endblock %}
       </a>
     </div>
     <div class="navbar-collapse collapse">
         {% if not form %}
       <ul id="nav-inner" class="nav navbar-nav navbar-left">
         <li class="active text-center" style="vertical-align: middle">
-            <a href="#candidati" role="tab" data-toggle="tab" class="active"><span class="glyphicon glyphicon-user fa-2x"></span> Candidati</a>
+            <a href="#candidati" role="tab" data-toggle="tab" class="active"><span class="glyphicon glyphicon-user fa-2x"></span><span class="hidden-xs"> Candidati</span></a>
         </li>
         <li class="text-center" style="">
-            <a href="#liste" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt fa-2x"></span> Liste</a>
+            <a href="#liste" role="tab" data-toggle="tab"><span class="glyphicon glyphicon-list-alt fa-2x"></span><span class="hidden-xs"> Liste</span></a>
         </li>
       </ul>
         {% endif %}

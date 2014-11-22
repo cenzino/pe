@@ -318,8 +318,10 @@ def aggiorna_voti(request):
 
             voti = v.voti + (1 if op == 'inc' else -1)
             if voti >= 0:
-                v.ultimo_aggiornamento = timezone.now
-                #v.ultimo_aggiornamento = timezone.localtime(timezone.now())
+                try:
+                    v.ultimo_aggiornamento = datetime.now()
+                except:
+                    pass
                 v.voti = voti
                 v.save()
         except KeyError:

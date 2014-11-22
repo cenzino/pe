@@ -2,6 +2,10 @@
 {% load staticfiles %}
 {% block title %}Rilevazione{% endblock %}
 
+{% block custum_style %}
+    <link href="{% static "css/rilevazione.css" %}" rel="stylesheet">
+{% endblock %}
+
 {% block nav %}
     {% include 'rilevazione/nav.html'%}
 {% endblock %}

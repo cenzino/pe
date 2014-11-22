@@ -7,6 +7,9 @@ body {
     margin-top: 40px;
 }
 
+footer {
+    margin-top: 6px;
+}
 /* strong,b { font-weight: 500; } */
 
 .navbar-default {

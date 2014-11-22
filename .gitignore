@@ -3,3 +3,4 @@
 media/upload/
 elezioni/migrations/
 .idea/
+proiezioni/secrets.py

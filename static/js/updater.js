@@ -11,9 +11,14 @@
        var decBtn = $("#updater-"+tipo+"-"+vid+"-dec-btn");
        var voti = parseInt(votiCnt.text());
 
+       console.log('voti: '+voti);
+       console.log('op: '+op);
+       console.log('voti: '+voti);
+
        if (voti == 0 && op == 'dec') {
+           console.log('----------------');
            me.button('reset');
-           //me.prop("disabled", true);
+           me.prop("disabled", true);
        } else {
            $.ajax({
                type: "POST",

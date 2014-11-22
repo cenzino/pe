@@ -8,6 +8,8 @@ urlpatterns = patterns('',
     url(r'^elezioni/', include('elezioni.urls')),
     url(r'^admin/', include(admin.site.urls)),
 
+    url(r'^api/updates_votes$', 'elezioni.views.aggiorna_voti', name='aggiorna_voti'),
+
     url(r'^login/$', 'django.contrib.auth.views.login',  {'template_name': 'login.html'}, name='login', ),
     url(r'^logout/$', 'django.contrib.auth.views.logout',  {'next_page': '/login'}, name='logout',),
 

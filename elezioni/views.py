@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test, per
 from .models import *
 from django.core.exceptions import PermissionDenied
 
+from django.utils import timezone
 
 def is_member_of(user, group_name, exclusive=True):
     if exclusive:
@@ -216,7 +217,7 @@ def rilevazione_index(request, sezione_id):
     sezione = Sezione.objects.select_related('votilista_set__lista').get(pk=sezione_id)
     voti_candidato = VotiCandidato.objects.select_related().filter(sezione_id=sezione_id).all()
     voti_lista = VotiLista.objects.select_related().filter(sezione_id=sezione_id).all()
-    return render(request, 'rilevazione/test.html', {'sezione': sezione, 'voti_candidato': voti_candidato, 'voti_lista': voti_lista})
+    return render(request, 'rilevazione/rilevazione.html', {'sezione': sezione, 'voti_candidato': voti_candidato, 'voti_lista': voti_lista})
 
 
 
@@ -296,28 +297,33 @@ def report_liste(request, elezione_id, ponderati=False):
 from django.conf import settings
 import time
 
-def test(request):
-    #print request.POST
+def aggiorna_voti(request):
     if request.is_ajax():
-        if getattr(settings, 'DEBUG', False): # only if DEBUG=True
-            import time
-            import random
+        if getattr(settings, 'DEBUG', False):
+            pass
+            #import time
+            #import random
             #time.sleep(random.randint(0,4)) # delay AJAX response for 5 seconds
-        #print "Ajax"
+
         try:
             id = int(request.POST['vid'])
-            v = get_object_or_404(VotiCandidato, pk=id)
+            tipo = str(request.POST['tipo'])
+            if tipo == 'candidato':
+                v = get_object_or_404(VotiCandidato, pk=id)
+            elif tipo == 'lista':
+                v = get_object_or_404(VotiLista, pk=id)
+            else:
+                raise Http404
             op = str(request.POST['op'])
 
             voti = v.voti + (1 if op == 'inc' else -1)
             if voti >= 0:
+                v.ultimo_aggiornamento = timezone.now
+                #v.ultimo_aggiornamento = timezone.localtime(timezone.now())
                 v.voti = voti
                 v.save()
-            #board_pk = int(request.POST['board'])
-            #moves = list(map(int, request.POST['move_list'].split(',')))
         except KeyError:
-            return HttpResponse('Error') # incorrect post
-        # do stuff, e.g. calculate a score
+            return HttpResponse('Error') # valori errati
         return HttpResponse(v.voti)
     else:
         raise Http404

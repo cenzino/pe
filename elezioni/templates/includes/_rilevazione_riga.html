@@ -1,0 +1,33 @@
+{% load staticfiles %}
+{% if elemento and tipo and voti %}
+<div class="col-xs-2 col-sm-1 col-md-1 col-lg-1 text-left">
+    {% if tipo == 'candidato' and elemento.foto %}
+        <img class="img-responsive" src="{{ MEDIA_URL }}{{ elemento.foto }}" alt=""/>
+    {% elif  tipo == 'lista' and elemento.simbolo %}
+        <img class="img-responsive" src="{{ MEDIA_URL }}{{ elemento.simbolo }}" alt=""/>
+    {% else %}
+        <img class="img-responsive" src="{% static "images/default.gif" %}" alt=""/>
+    {% endif %}
+</div>
+<div class="col-xs-2 col-sm-6 col-md-6 col-lg-7">
+    <h5>
+        {% if tipo == 'candidato' %}
+            {{ elemento.cognome|upper }}<p class="text-muted" style="font-size: small">{{ elemento.nome }}</p>
+        {% elif tipo == 'lista' %}
+            {{ elemento.nome|upper }}<p class="text-muted text-nowrap" style="font-size: small; font-weight: 400; margin-top:2px">{{ elemento.candidato.cognome|upper }}</p>
+        {% else %}
+        {% endif %}
+    </h5>
+</div>
+<div class="col-xs-3 col-sm-1 col-md-1 col-lg-1 text-right">
+    <span id="voti-{{ tipo }}-{{ voti.id }}" class="voti">{{ voti.voti }}</span>
+</div>
+<div class="col-xs-5 col-sm-2 col-md-1 col-lg-1 text-right">
+    <button type="button" id="updater-{{ tipo }}-{{ voti.id }}-dec-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ voti.id }}" data-tipo="{{ tipo }}" data-operazione="dec" class="btn btn-default btn-circle btn-lg updater" {% if voti.voti == 0 %}disabled{% endif %} autocomplete="off">
+      <span class="glyphicon glyphicon-minus"></span>
+    </button>
+    <button type="button" id="updater-{{ tipo }}-{{ voti.id }}-inc-btn" data-loading-text='<i class="fa fa-circle-o-notch fa-spin"></i>' data-vid="{{ voti.id }}" data-tipo="{{ tipo }}" data-operazione="inc" class="btn btn-success btn-circle btn-xl updater" autocomplete="off">
+      <span class="glyphicon glyphicon-plus"></span>
+    </button>
+</div>
+{% endif %}

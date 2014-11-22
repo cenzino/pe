@@ -28,10 +28,10 @@ urlpatterns = patterns('',
     url(r'^rilevazione/(?P<sezione_id>\d+)/$', views.rilevazione_index, name='rilevazione_index'),
     url(r'^rilevazione/(?P<sezione_id>\d+)/edita/$', views.edita_sezione, name='edita_sezione'),
 
-    url(r'^test$', views.test, name='test'),
-    url(r'^test_bianche$', views.test_bianche, name='test_bianche'),
-    url(r'^test_nulle$', views.test_nulle, name='test_nulle'),
-    url(r'^test2$', views.test2, name='test2'),
+    #url(r'^updates_votes$', views.aggiorna_voti, name='aggiorna_voti'),
+    #url(r'^test_bianche$', views.test_bianche, name='test_bianche'),
+    #url(r'^test_nulle$', views.test_nulle, name='test_nulle'),
+    #url(r'^test2$', views.test2, name='test2'),
     url(r'^check$', views.check_proiezione, name='check'),
 )# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

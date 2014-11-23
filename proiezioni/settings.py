@@ -106,6 +106,13 @@ LOGIN_REDIRECT_URL = '/'
 LOGIN_URL = '/login/'
 LOGOUT_URL = '/logout/'
 
+TEMPLATE_LOADERS = (
+    ('django.template.loaders.cached.Loader', (
+        'django.template.loaders.filesystem.Loader',
+        'django.template.loaders.app_directories.Loader',
+    )),
+)
+
 if LIVEHOST:
     """
     Configurazione di Produzione
@@ -119,6 +126,8 @@ if LIVEHOST:
         'proiezioni.tiesi.webfactional.com',
         'ex.proiezioni.tiesi.webfactional.com',
         'px.proiezioni.tiesi.webfactional.com',
+        'proiezioni.tiesi.it',
+        'www.proiezioni.tiesi.it',
     ]
 
     DATABASES = {
@@ -130,6 +139,13 @@ if LIVEHOST:
             'HOST': '',
             'PORT': '',
             'ATOMIC_REQUESTS': True,
+        }
+    }
+
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+            'LOCATION': 'unix:/home/username/memcached_proiezioni.sock',
         }
     }
     STATIC_URL = '/static/'

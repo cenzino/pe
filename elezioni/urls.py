@@ -21,8 +21,8 @@ urlpatterns = patterns('',
     url(r'^report/(?P<elezione_id>\d+)/candidati/$', views.report_candidati, {'ponderati': True }, name='report_candidati'),
     url(r'^report/(?P<elezione_id>\d+)/liste/$', views.report_liste, {'ponderati': True }, name='report_liste'),
 
-    url(r'^report/(?P<elezione_id>\d+)/candidati-dati/$', views.report_candidati, name='report_candidati_dati'),
-    url(r'^report/(?P<elezione_id>\d+)/liste-dati/$', views.report_liste, name='report_liste_dati'),
+    url(r'^report/(?P<elezione_id>\d+)/candidati-dati/$', views.report_candidati,  {'ponderati': False }, name='report_candidati_dati'),
+    url(r'^report/(?P<elezione_id>\d+)/liste-dati/$', views.report_liste,  {'ponderati': False }, name='report_liste_dati'),
 
     url(r'^rilevazione/$', views.rilevazione_home, name='rilevazione_home'),
     url(r'^rilevazione/(?P<sezione_id>\d+)/$', views.rilevazione_index, name='rilevazione_index'),

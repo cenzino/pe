@@ -9,6 +9,7 @@ from .models import *
 from django.core.exceptions import PermissionDenied
 
 from django.utils import timezone
+from django.views.decorators.cache import cache_page
 
 def is_member_of(user, group_name, exclusive=True):
     if exclusive:
@@ -67,7 +68,8 @@ def proiezioni_home(request):
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
-def proiezioni_candidati(request, elezione_id, proiezione_id=1):
+@cache_page(60 * 3)
+def proiezioni_candidati(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
     if request.user.is_superuser:
@@ -81,6 +83,7 @@ def proiezioni_candidati(request, elezione_id, proiezione_id=1):
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
+@cache_page(60 * 3)
 def proiezioni_liste(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
@@ -102,6 +105,7 @@ def proiezioni_liste(request, elezione_id):
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
+@cache_page(60 * 3)
 def proiezioni_candidato_one(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
@@ -125,6 +129,7 @@ def proiezioni_candidato_one(request, elezione_id):
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
+@cache_page(60 * 3)
 def proiezioni_candidato(request, elezione_id, candidato_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
     candidato = get_object_or_404(Candidato, pk=candidato_id)
@@ -199,6 +204,7 @@ def rilevazione_home(request):
     """
 
 @login_required(login_url='/login/')
+@permission_required('elezioni.can_update_votes','/login/', True)
 def rilevazione_index(request, sezione_id):
     #sezione = get_object_or_404(Sezione.objects.select_related('voticandidato__candidato'), pk=sezione_id)
     sezione = Sezione.objects.select_related('votilista_set__lista').get(pk=sezione_id)
@@ -245,7 +251,7 @@ def report_home(request):
         elezioni = Elezione.aperte.all()
 
     if elezioni.count() == 1:
-        return redirect('report_candidati', elezione_id=elezioni.first().id)
+        return redirect('report_candidati_dati', elezione_id=elezioni.first().id)
         pass
 
     return render(request, 'index.html', { 'elezioni': elezioni  })
@@ -268,8 +274,6 @@ def crea_proiezione(request, elezione_id):
 @transaction.atomic
 def report_candidati(request, elezione_id, ponderati=False):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
-
-
 
     return render(request, 'report/report.html', { 'elezione': elezione, 'risultati': elezione.get_risultati(Candidato, ponderati)})
 

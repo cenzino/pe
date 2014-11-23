@@ -68,6 +68,7 @@ class Elezione(models.Model):
             return copertura
 
     def _pondera(self, cls):
+        print "siiii pondera!!!!"
         elemento = cls._meta.model_name
         elementi = cls._meta.verbose_name_plural.lower()
 
@@ -108,7 +109,8 @@ class Elezione(models.Model):
                 e.save()
 
     def get_risultati(self, cls, ponderati=False):
-        self._pondera(cls)
+        if ponderati:
+            self._pondera(cls)
         elemento = cls._meta.model_name
         elementi = cls._meta.verbose_name_plural.lower()
 

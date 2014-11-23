@@ -1,0 +1,11 @@
+{% load eletags humanize %}
+<div class="row info-proiezione">
+    <div class="col-xs-10">
+        <span>COPERTURA CAMPIONE: <b>{% widthratio proiezione.copertura 1 100%}%</b></span>
+
+        <span class="pull-right text-muted">
+            Dato aggiornato alle</i>: {{ proiezione.data_creazione|date:'G:i' }}
+{#            <small>({{ proiezione.data_creazione|naturaltime }})</small>#}
+        </span>
+    </div>
+</div>

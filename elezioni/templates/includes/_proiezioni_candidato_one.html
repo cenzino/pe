@@ -1,10 +1,13 @@
 {% load eletags %}
-<div class="col-md-3" style="padding: 5px;">
+{% comment %}
+<div class="col-xs-3" style="padding: 5px;">
+*
     <div class="thumbnail">
         <img src="{{ MEDIA_URL }}{{ candidato.candidato.foto|default:"images/default.gif" }}" alt="..." class="img-responsive" style="width:100%">
 
         <div class="caption text-center"style="background-color: #111; color: #fff; ">
             <span class="h5">{{ candidato.candidato.cognome|upper }}</span>
+            ***
         </div>
         <div class="caption text-center" style="background-color: gold">
             {% with voti=candidato.voti %}
@@ -19,7 +22,7 @@
         </div>
     </div>
 </div>
-<div class="col-md-6" style="padding: 5px;">
+<div class="col-xs-6" style="padding: 5px;">
     <div class="">
         <table class="table table-bordered">
         {% for x in candidato.candidato.liste.all %}
@@ -50,3 +53,4 @@
         </table>
     </div>
 </div>
+{% endcomment %}

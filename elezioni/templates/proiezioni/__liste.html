@@ -1,7 +1,8 @@
 {% extends "proiezioni/base.html" %}
 {% load eletags %}
 
-{% block title %}Proiezioni Candidati{% endblock %}
+{% block title %}Proiezione Coalizioni{% endblock %}
+{% block brand %}Coalizioni{% endblock %}
 {% block custum_style %}
 <style>
 .thumbnail .caption {
@@ -68,6 +69,7 @@ h4 {
 {% endblock %}
 
 {% block content %}
+    *
 <table class="table table-bordered">
     {% with  voti_totali_elezione=elezione.voti_totali_liste.voti_mod %}
     {% for candidato in candidati|dictsortreversed:"voti_totali_liste.voti_mod" %}

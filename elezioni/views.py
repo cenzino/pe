@@ -42,69 +42,6 @@ def home(request):
 
     raise PermissionDenied
 
-    """
-    if user.is_superuser or user.is_staff:
-        elezioni = Elezione.objects.all()
-        return render(request, 'index.html', { 'elezioni': elezioni })
-    else:
-        gruppi = user.groups.filter(name__in=config.DEFAULT_SYSTEM_GROUPS)
-
-        if len(gruppi) == 1:
-            gruppo = gruppi.first()
-            if gruppo == config.RICERCATORI:
-                return redirect('report_home')
-            elif gruppo == config.RILEVATORI:
-                return redirect('rilevazione_home')
-            elif gruppo == config.EMITTENTI:
-                return redirect('proiezioni_home')
-        print user.groups.filter(name__in=config.DEFAULT_SYSTEM_GROUPS)
-        raise PermissionDenied
-    """
-
-    #elezioni = Elezione.objects.all()
-    #if request.user:
-        #print request.user
-        #print request.user.has_perms(['proiezioni','report','rilevazione'])
-        #print request.user.has_perms(['cippalippa'])
-    #return render(request, 'index.html', { 'elezioni': elezioni })
-    #return render(request, 'login.html')
-
-    #return redirect('proiezioni_home', elezione_id=1)
-    #return redirect('rilevazione_home', sezione_id=1)
-    """
-    user = request.user
-    if user.is_superuser or user.is_staff:
-        elezioni = Elezione.objects.all()
-        return render(request, 'index.html', { 'elezioni': elezioni })
-
-    if user.profilo.is_(Profilo.RILEVATORE):
-        if not user.has_perms('elezioni.can_update_votes'):
-            raise PermissionDenied
-
-        sezioni = Sezione.objects.filter(rilevatore_id=request.user.id, elezione__chiusa=False).all()
-        if sezioni.count() == 1:
-            return redirect('rilevazione_index', sezione_id=sezioni.first().id)
-        else:
-            elezioni = Elezione.objects.prefetch_related('sezioni').filter(sezione__rilevatore=user).distinct()
-        return render(request, 'index.html', { 'elezioni': elezioni })
-    elif user.profilo.is_(Profilo.RICERCATORE):
-        #return redirect('report_home')
-        elezioni = Elezione.objects.prefetch_related('sezioni').filter(ricercatori__in=[user]).distinct()
-        return render(request, 'index.html', { 'elezioni': elezioni })
-    elif user.profilo.is_(Profilo.EMITTENTE):
-        return redirect('proiezioni_home')
-    elif user.profilo.is_(Profilo.AMMINISTRATORE):
-        return render(request, 'index.html', { 'elezioni': elezioni })
-    else:
-        pass
-    #return redirect('report_home', elezione_id=1)
-    """
-
-"""
-def login(request):
-    return render(request, 'login.html')
-"""
-
 # ### PROIEZIONI
 # ### ==================================================
 
@@ -123,41 +60,91 @@ def proiezioni_home(request):
         elezioni = Elezione.aperte.all()
 
     if elezioni.count() == 1:
+
         return redirect('proiezioni_candidati', elezione_id=elezioni.first().id)
 
     return render(request, 'index.html', {'elezioni': elezioni})
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
-def proiezioni_candidati(request, elezione_id):
+def proiezioni_candidati(request, elezione_id, proiezione_id=1):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
-    return render(request, 'proiezioni/candidati.html', { 'elezione': elezione })
+
+    if request.user.is_superuser:
+        proiezione = Proiezione.objects.filter(elezione_id=elezione_id).order_by('data_pubblicazione').last()
+    elif is_member_of(request.user, config.RICERCATORI):
+        proiezione = Proiezione.objects.filter(elezione_id=elezione_id).order_by('data_pubblicazione').last()
+    elif is_member_of(request.user, config.EMITTENTI):
+        proiezione = Proiezione.objects.filter(elezione_id=1, pubblicata=True).order_by('data_pubblicazione').last()
+
+    return render(request, 'proiezioni/_candidati.html', { 'elezione': elezione, 'proiezione': proiezione })
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
 def proiezioni_liste(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
-    return render(request, 'proiezioni/liste.html', { 'elezione': elezione })
+    if request.user.is_superuser:
+        proiezione = Proiezione.objects.select_related().filter(elezione_id=elezione_id).order_by('data_pubblicazione').last()
+    elif is_member_of(request.user, config.RICERCATORI):
+        proiezione = Proiezione.objects.select_related().filter(elezione_id=elezione_id).order_by('data_pubblicazione').last()
+    elif is_member_of(request.user, config.EMITTENTI):
+        proiezione = Proiezione.objects.select_related().filter(elezione_id=1, pubblicata=True).order_by('data_pubblicazione').last()
+    else:
+        raise PermissionDenied
+
+    if not proiezione:
+        return render(request, 'proiezioni/_candidati.html', { 'elezione': elezione, 'proiezione': proiezione })
+
+    return render(request, 'proiezioni/liste.html', { 'elezione': elezione, 'proiezione': proiezione })
+
+
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
 def proiezioni_candidato_one(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
-    candidato = elezione.proiezioni.last
 
-    return render(request, 'proiezioni/candidati_one.html', { 'elezione': elezione, 'candidato': candidato })
+    if request.user.is_superuser:
+        proiezione = Proiezione.objects.filter(elezione_id=elezione_id).order_by('data_pubblicazione').last()
+    elif is_member_of(request.user, config.RICERCATORI):
+        proiezione = Proiezione.objects.filter(elezione_id=elezione_id).order_by('data_pubblicazione').last()
+    elif is_member_of(request.user, config.EMITTENTI):
+        proiezione = Proiezione.objects.filter(elezione_id=1, pubblicata=True).order_by('data_pubblicazione').last()
+    else:
+        raise PermissionDenied
+
+    if proiezione:
+        candidato = elezione.proiezioni.last
+    else:
+        return render(request, 'proiezioni/_candidati.html', { 'elezione': elezione, 'proiezione': proiezione })
+
+
+    return render(request, 'proiezioni/__candidati_one.html', { 'elezione': elezione, 'proeiezione': proiezione, 'candidato': candidato })
+
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
 def proiezioni_candidato(request, elezione_id, candidato_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
     candidato = get_object_or_404(Candidato, pk=candidato_id)
-    proiezione = Proiezione.objects.filter(elezione_id=elezione.id).last()
-    daticandidato = DatiProiezioneCandidato.objects.filter(proiezione_id=proiezione.id, candidato_id=candidato.id).first()
-    datiliste = DatiProiezioneLista.objects.filter(lista__candidato_id=candidato.id, proiezione_id=proiezione.id).all()
 
-    return render(request, 'proiezioni/candidato.html', { 'elezione': elezione, 'candidato': daticandidato, 'proiezione': proiezione, 'liste': datiliste })
+    if request.user.is_superuser:
+        proiezione = Proiezione.objects.filter(elezione_id=elezione_id).order_by('data_pubblicazione').last()
+    elif is_member_of(request.user, config.RICERCATORI):
+        proiezione = Proiezione.objects.filter(elezione_id=elezione_id).order_by('data_pubblicazione').last()
+    elif is_member_of(request.user, config.EMITTENTI):
+        proiezione = Proiezione.objects.filter(elezione_id=1, pubblicata=True).order_by('data_pubblicazione').last()
+    else:
+        raise PermissionDenied
+
+    if proiezione:
+        daticandidato = DatiProiezioneCandidato.objects.filter(proiezione_id=proiezione.id, candidato_id=candidato.id).first()
+        datiliste = DatiProiezioneLista.objects.filter(lista__candidato_id=candidato.id, proiezione_id=proiezione.id).all()
+    else:
+        return render(request, 'proiezioni/_candidati.html', { 'elezione': elezione, 'proiezione': proiezione })
+
+    return render(request, 'proiezioni/_candidato.html', { 'elezione': elezione, 'candidato': daticandidato, 'proiezione': proiezione, 'liste': datiliste })
 
 # ### RILEVAZIONE
 # ### ==================================================

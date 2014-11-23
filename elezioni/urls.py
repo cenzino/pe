@@ -14,7 +14,7 @@ urlpatterns = patterns('',
     url(r'^proiezioni/$', views.proiezioni_home, name='proiezioni_home'),
     url(r'^proiezioni/(?P<elezione_id>\d+)/candidati/$', views.proiezioni_candidati, name='proiezioni_candidati'),
     url(r'^proiezioni/(?P<elezione_id>\d+)/liste/$', views.proiezioni_liste, name='proiezioni_liste'),
-    url(r'^proiezioni/(?P<elezione_id>\d+)/candidato/$', views.proiezioni_candidato_one, name='proiezioni_candidato_one'),
+    #url(r'^proiezioni/(?P<elezione_id>\d+)/candidato/$', views.proiezioni_candidato_one, name='proiezioni_candidato_one'),
     url(r'^proiezioni/(?P<elezione_id>\d+)/candidato/(?P<candidato_id>\d+)/$', views.proiezioni_candidato, name='proiezioni_candidato'),
 
     url(r'^report/$', views.report_home, name='report_home'),
@@ -28,10 +28,7 @@ urlpatterns = patterns('',
     url(r'^rilevazione/(?P<sezione_id>\d+)/$', views.rilevazione_index, name='rilevazione_index'),
     url(r'^rilevazione/(?P<sezione_id>\d+)/edita/$', views.edita_sezione, name='edita_sezione'),
 
-    #url(r'^updates_votes$', views.aggiorna_voti, name='aggiorna_voti'),
-    #url(r'^test_bianche$', views.test_bianche, name='test_bianche'),
-    #url(r'^test_nulle$', views.test_nulle, name='test_nulle'),
-    #url(r'^test2$', views.test2, name='test2'),
+
     url(r'^check$', views.check_proiezione, name='check'),
 )# + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

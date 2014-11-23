@@ -1,0 +1,81 @@
+{% extends "proiezioni/base.html" %}
+{% load staticfiles eletags humanize %}
+
+{% block title %}Proiezioni Candidati{% endblock %}
+{% block custum_style %}
+<style>
+    .badge-candidato-5 {
+        margin-left: 0;
+        padding-left: 0px;
+    }
+    .badge-candidato-5 .voti {
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+</style>
+
+{% endblock %}
+{% block pagetitle %}Liste Candidato{% endblock %}
+{% block proiezione %}
+        {% include 'includes/_proiezioni_info.html' with proeizione=proiezione %}
+        <div class="row">
+            <div class="col-xs-2">
+               <div class="caption text-center pull-right" style="background-color: gold; width: 100%; margin-bottom: 4px;">
+                        {% with voti=candidato.voti_liste %}
+                        <h1 class="h1 perc" style="margin: 0; margin-right: -20px; padding-top: 15px; font-weight: bold;">{{ voti|floatformat:1 }}<small>%</small></h1>
+                        {% with forbice=candidato.forbice_liste %}
+                        <p class="text-nowrap forb" style="font-size: 85%">
+                            {{ forbice|forbice_inf_of:voti|floatformat:1 }}<small class="text-muted">%</small> –
+                            {{ forbice|forbice_sup_of:voti|floatformat:1 }}<small class="text-muted">%</small>
+                        </p>
+                        {% endwith %}
+                    {% endwith %}
+                </div>
+                {% include 'includes/_proiezioni_candidato.html' with candidato=candidato %}
+            </div>
+            <div class="col-xs-5" style="border: 5px solid gold; margin-left: -10px;">
+                <div class="container-fluid">
+                    <div class="row">
+                        {% for l in liste %}
+                            <div class="col-xs-3">
+
+                            {% with lista=l.lista %}
+                                <div class="thumbnail text-center" style="">
+                                    <img src="{{ MEDIA_URL }}{{ lista.simbolo|default:"images/default.gif" }}" alt="..." class="img-circle img-responsive" style="width: 85%">
+
+                                    <div class="caption text-center" style="margin: 0; padding: 0">
+                                        {% with voti=l.voti %}
+                                            <span class="h3 text-center perc"><b>{{ voti|floatformat:1 }}</b><small>%</small></span>
+                                            {% with forbice=l.forbice %}
+                                            <p class="text-center text-nowrap forb" style="font-size: 85%; margin: 0; margin-top: -4px">
+                                                {{ forbice|forbice_inf_of:voti|floatformat:1 }}<small class="text-muted">%</small> –
+                                                {{ forbice|forbice_sup_of:voti|floatformat:1 }}<small class="text-muted">%</small>
+                                            </p>
+                                            {% endwith %}
+                                        {% endwith %}
+                                    </div>
+                                </div>
+                            {% endwith %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+                <div class="col-xs-3">
+                    <img src="{% static 'images/logo-demoskopika-big.jpg' %}" class="img-responsive " style="max-width: 200px; margin:auto; margin-top: 50px;"/>
+
+                    <div class="text-center">
+                        <img src="{% static 'images/tiesi-logo.png' %}" class="img-responsive" style="max-width: 90px; margin: auto; margin-top: 120px; "/>
+                    </div>
+                </div>
+
+        </div>
+        <div class="row">
+            <div class="col-xs-10 errore text-center" style="padding-top: 2px; padding-left: 105px;">
+        <small class="text-right">Ricerca soggetta a errore statistico</small>
+    </div>
+        </div>
+
+{% endblock %}
+{% block sponsor %}{% endblock %}

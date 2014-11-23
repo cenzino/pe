@@ -2,25 +2,23 @@
 {% load eletags humanize %}
 
 {% block title %}Proiezioni Candidati – {{ elezione }}{% endblock %}
-{% block brand %}{{ elezione }}{% endblock %}
-
 {% block custum_style %}
 
 {% endblock %}
 
 {% block proiezione %}
-
-    <div class="container-fluid" style="margin: 0px; padding: 0px;">
-    {% with proiezione=elezione.proiezioni.all.last %}
     {% if proiezione %}
-    <div class="row">
-        <div class="col-md-12">
-            <span>COPERTURA CAMPIONE: <b>{% widthratio proiezione.copertura 1 100%}%</b></span>
+        {% include 'includes/_proiezioni_info.html' with proeizione=proiezione %}
+    <div class="row proiezione-candidati">
+    {% for candidato in proiezione.candidati.all %}
+    <div class="col-xs-2 candidato">
+            {% include 'includes/_proiezioni_candidato.html' with candidato=candidato %}
+    </div>
+    {% endfor %}
+    </div>
 
-            <span class="pull-right text-muted">
-                Dati aggiornati alle</i>: {{ proiezione.data_creazione|date:'G:i' }} <small>({{ proiezione.data_creazione|naturaltime }}</small>)
-            </span>
-        </div>
+    <div class="col-xs-10 errore text-right">
+        <small class="text-right">Ricerca soggetta a errore statistico</small>
     </div>
 
     {% comment %}
@@ -33,13 +31,14 @@
     {% endfor %}
     {% endcomment %}
 
+    {% comment %}
         {% for candidato in proiezione.candidati.all|dictsortreversed:"voti" %}
 
             {% if forloop.counter0 == 0 or forloop.counter0 == 1 %}
                 {% if forloop.counter0 == 0 %}
                     <div class="row" style="padding-top: 20px;">
                 {% endif %}
-                    <div class="col-md-4 {% if forloop.counter0 == 0 %}col-md-offset-2{% endif %}" style="padding: 20px;">
+                    <div class="col-xs-4 {% if forloop.counter0 == 0 %}col-md-offset-2{% endif %}" style="padding: 20px;">
                         <a href="{% url 'proiezioni_candidato' elezione.id candidato.candidato_id %}">
                         {% include 'includes/_proiezioni_candidato.html' with candidato=candidato %}
                         </a>
@@ -51,7 +50,7 @@
                 {% if forloop.counter0 == 2 %}
                     <div class="row" style="padding-top: 0px; margin-top: 0; padding: 0px; margin: 0px;">
                 {% endif %}
-            <div class="col-md-2 {% if forloop.counter0 == 2 %}col-md-offset-3{% endif %}" style="padding: 0px 5px;">
+            <div class="col-xs-2 {% if forloop.counter0 == 2 %}col-xs-offset-3{% endif %}" style="padding: 0px 5px;">
                 <a href="{% url 'proiezioni_candidato' elezione.id candidato.candidato_id %}">
                 {% include 'includes/_proiezioni_candidato.html' with candidato=candidato %}
                 </a>
@@ -61,28 +60,9 @@
                 {% endif %}
             {% endif %}
         {% endfor %}
+     {% endcomment %}
 
     {% else %}
         Al momento non ci sono proiezioni disponibili.
     {% endif %}
-
-    {% endwith %}
-    </div>
 {% endblock %}
-
-        {% comment %}
-        <h4>Liste</h4>
-        <ul>
-            {% for lista in proiezione.liste.all %}
-            <li>{{ lista.lista|upper }}
-                <strong>{{ lista.voti }}</strong>%
-                <small>
-                <{{ lista.forbice|forbice_inf_of:lista.voti }}<small class="text-muted">%</small>
-                –
-                {{ lista.forbice|forbice_sup_of:lista.voti }}<small class="text-muted">%</small>>
-                <<strong class="text-muted">{{ lista.forbice }}</strong>%>
-                </small>
-            </li>
-            {% endfor %}
-        <ul>
-        {% endcomment %}

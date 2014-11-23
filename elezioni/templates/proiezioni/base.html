@@ -1,66 +1,190 @@
-{% extends "base.html" %}
+{% load staticfiles elezioni_helper eletags %}
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+{#    <meta name="viewport" content="width=device-width, initial-scale=1">#}
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
 
-{% block title %}Proiezioni – {{ elezione }}{% endblock %}
+    <title>{% block title %}Proiezioni – {{ elezione }}{% endblock %}</title>
 
-{% block brand %}Proiezioni {% endblock %}
+    <!-- Bootstrap core CSS -->
+    <link href="{% static "bootstrap/dist/css/bootstrap-no-responsive-10.min.css" %}" rel="stylesheet">
+{#    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,700,300,400' rel='stylesheet' type='text/css'>#}
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300,400italic,500,500italic,700italic,300italic|Roboto+Condensed:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>
+    <!-- Custom styles for this template -->
+    <!--
+    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300,400italic,500,500italic,700italic,300italic|Roboto+Condensed:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    -->
+    <link rel="stylesheet" href="{% static "font-awesome/css/font-awesome.min.css" %}">
+    <link href="{% static "style.css" %}" rel="stylesheet">
+    <link href="{% static "css/proiezioni.css" %}" rel="stylesheet">
 
-{% block navmenu %}
-<li class="dropdown-header">Proiezioni</li>
-<li><a href="{% url 'proiezioni_candidati' elezione.id %}"><span class="glyphicon glyphicon-user"></span> Candidati</a></li>
-<li><a href="{% url 'proiezioni_liste' elezione.id %}"><span class="glyphicon glyphicon-list-alt"></span> Liste</a></li>
-{% endblock %}
+    <style>
 
-{% block content %}
-    <span id="elezione" data-id="{{ elezione.id }}"></span>
-    <span id="proiezione" data-id="{{ elezione.proiezioni.last.id }}"></span>
-    <div id="alert" class="alert alert-success hidden" role="alert">
-      <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Una nuova <b>proiezione</b> è disponibile! Per visualizzarla clicca <a href="#" class="alert-link">qui</a>.
-        <button type="button" class="close" data-dismiss="alert">
-          <span aria-hidden="true">&times;</span>
-          <span class="sr-only">Close</span>
-        </button>
-    </div>
-    <div class="row">
-        <div class="col-md-8">
-            {% block proiezione %}
-            {% endblock %}
+    </style>
+    {% block custum_style %}{% endblock %}
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    {% block nav %}
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" style="margin-top: 6px;" href="{% url 'home' %}">{% block brand %}{{ elezione }}{% endblock %}</a>
         </div>
-        <div class="col-md-4" style="">
-            {% block sponsor %}
-                {% include 'includes/_sponsor.html' %}
-            {% endblock %}
-        </div>
+        <div class="collapse navbar-collapse">
+            {% comment %}
+          <ul class="nav navbar-nav">
+            <li><a href="{% url 'proiezioni_candidati' elezione.id %}"><span class="glyphicon glyphicon-user"></span> Candidati</a></li>
+            <li><a href="{% url 'proiezioni_liste' elezione.id %}"><span class="glyphicon glyphicon-list-alt"></span> Liste</a></li>
+          </ul>
+          {% endcomment %}
+      <ul class="nav navbar-nav navbar-right" role="tablist">
+{#        <li><a href="#"><i class="fa fa-pie-chart fa-2x pull-left"></i><span id="notify" class="badge pull-left">1</span></a></li>#}
+        <li class="dropdown">
+{#            <i class="fa fa-ellipsis-v fa-lg"></i>#}
+          <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="fa fa-pie-chart fa-2x"></i></a>
+          <ul class="dropdown-menu" role="menu">
+              <li class="dropdown-header"></li>
+                {% block navmenu %}
+                <li class="dropdown-header">Proiezioni</li>
+                <li class="divider"></li>
+                <li><a href="{% url 'proiezioni_candidati' elezione.id %}"><span class="glyphicon glyphicon-user"></span> Presidente</a></li>
+
+                        <li class="divider"></li>
+                <li><a href="{% url 'proiezioni_liste' elezione.id %}"><span class="glyphicon glyphicon-list-alt"></span> Coalizioni</a></li>
+                    {% if proiezione %}
+                        <li class="divider"></li>
+                        <li role="presentation" class="dropdown-header">Candidati e Liste</li>
+                        {% for c in proiezione.candidati.all %}
+                            <li style=""><a href="{% url 'proiezioni_candidato' elezione.id c.candidato_id %}"><span class="glyphicon glyphicon-user"></span> {{ c.candidato }}</a></li>
+
+                        {% endfor%}
+                    {% endif %}
+                {% endblock %}
+              <li class="divider"></li>
+              <li role="presentation" class="dropdown-header">{{ user.get_full_name }}</li>
+              <li></li>
+              <li><a href="{% url 'logout' %}"><span class="glyphicon glyphicon-log-out"></span> Esci</a></li>
+          </ul>
+        </li>
+      </ul>
+        </div><!--/.nav-collapse -->
+      </div>
     </div>
-{% endblock %}
+
+    {% endblock %}
+
+    <div class="container">
+       <div class="page-title">
+          <h1>Proiezione {% block pagetitle %}Presidente{% endblock %}</h1>
+       </div>
+    {% block content %}
+          {% block proiezione %}
+          <div class="row">
+            <div class="col-xs-4">
+              <h1>Welcome to Non-responsive Land</h1>
+            </div>
+            <div class="col-xs-6">
+              <!-- More content, more content -->
+            </div>
+          </div>
+          {% endblock %}
+          {% block sponsor %}
+          <div class="row">
+            <div class="col-xs-5">
+                <img src="{% static 'images/logo-demoskopika-big.jpg' %}" class="img-responsive logo-field" style="max-height: 200px;"/>
+            </div>
+            <div class="col-xs-5">
+                <div class="text-center">
+                    <img src="{% static 'images/tiesi-logo.png' %}" class="img-responsive logo-tiesi"/>
+                </div>
+            </div>
+          </div>
+          {% endblock %}
+        {% comment %}
+        <span id="elezione" data-id="{{ elezione.id }}"></span>
+        <span id="proiezione" data-id="{{ elezione.proiezioni.last.id }}"></span>
+        <div id="alert" class="alert alert-success hidden" role="alert">
+          <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span> Una nuova <b>proiezione</b> è disponibile! Per visualizzarla clicca <a href="#" class="alert-link">qui</a>.
+            <button type="button" class="close" data-dismiss="alert">
+              <span aria-hidden="true">&times;</span>
+              <span class="sr-only">Close</span>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-8">
+                {% block proiezione %}
+                {% endblock %}
+            </div>
+            <div class="col-md-4" style="">
+                {% block sponsor %}
+                    {% include 'includes/_sponsor.html' %}
+                {% endblock %}
+            </div>
+        </div>
+        {% endcomment %}
+    {% endblock %}
+    </div>
+
+    <!-- /.container -->
+      <footer class="footer text-center text-muted">
+        <!-- <img src="{% static "images/tiesi-logo.png" %}" class="" style="width:60px;"/> -->
+        <p class="small">Centro Elaborazione Dati – TI&SI Srl</p>
+      </footer>
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="{% static "bootstrap/dist/js/bootstrap.min.js" %}"></script>
+    {% comment %}
+    <script type="text/javascript">
 
 
-<script type="text/javascript">
+    (function worker() {
+      $.ajax({
+        url: '/elezioni/check',
+        data: {
+            //csrfmiddlewaretoken: '{{ csrf_token }}',
+            //'id': me.data( "vid" ), // from form
+            'id': $('#elezione').data('id')
 
-(function worker() {
-  $.ajax({
-    url: '/elezioni/check',
-    data: {
-        //csrfmiddlewaretoken: '{{ csrf_token }}',
-        //'id': me.data( "vid" ), // from form
-        'id': $('#elezione').data('id')
-
-    },
-    success: function(data) {
-      $('.result').html(data);
-        pid = parseInt($('#proiezione').data('id'));
-        console.log(pid);
-        if (parseInt(data) != pid) {
-            console.log('Nuova proiezione')
-            $("#alert").removeClass('hidden');
+        },
+        success: function(data) {
+          $('.result').html(data);
+            pid = parseInt($('#proiezione').data('id'));
+            console.log(pid);
+            if (parseInt(data) != pid) {
+                console.log('Nuova proiezione')
+                $("#alert").removeClass('hidden');
+            }
+        },
+        complete: function() {
+          // Schedule the next request when the current one's complete
+          setTimeout(worker, 4000);
         }
-    },
-    complete: function() {
-      // Schedule the next request when the current one's complete
-      setTimeout(worker, 4000);
-    }
-  });
-})();
+      });
+    })();
+    </script>
+    {% endcomment %}
 
-</script>
-{% block scripts %}
-{% endblock %}
+    {% block scripts %}{% endblock%}
+  </body>
+</html>

@@ -11,7 +11,7 @@ body {
     padding-top: 0;
     margin-top: 40px;
 
-    font-family: arial,'Roboto', 'Roboto Condensed', sans-serif;
+    font-family: arial, sans-serif;
 }
 .container {
   max-width: none !important;
@@ -25,7 +25,42 @@ body {
   width: 760px;
 }
 
+.navbar-default .navbar-text {
+    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.navbar-text {
+    margin-top: 12px;
+    margin-bottom: 15px;
+}
+
+.navbar-inverse {
+    background-color: #FFF;
+    border-color: #333;
+    /*#8dc63f*/
+}
+
+.navbar-text .title {
+    font-size: 25px;
+}
+
+.brand {
+
+}
+
+.navbar-default .navbar-nav>li>a {
+    color: #8dc63f;
+}
+
+.brand span {
+    font-size: 13px;
+}
+
 .page-title {
+    background-color:#8dc63f;
+    color: #FFF;
     padding-top: 10px;
     padding-bottom: 3px;
 }

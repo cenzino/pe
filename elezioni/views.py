@@ -68,7 +68,7 @@ def proiezioni_home(request):
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
-@cache_page(60 * 3)
+#@cache_page(60 * 3)
 def proiezioni_candidati(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
@@ -83,7 +83,7 @@ def proiezioni_candidati(request, elezione_id):
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
-@cache_page(60 * 3)
+#@cache_page(60 * 3)
 def proiezioni_liste(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
@@ -105,7 +105,7 @@ def proiezioni_liste(request, elezione_id):
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
-@cache_page(60 * 3)
+#@cache_page(60 * 3)
 def proiezioni_candidato_one(request, elezione_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
 
@@ -129,7 +129,7 @@ def proiezioni_candidato_one(request, elezione_id):
 
 @login_required(login_url='/login/')
 @permission_required('elezioni.can_view_projections','/login/', True)
-@cache_page(60 * 3)
+#@cache_page(60 * 3)
 def proiezioni_candidato(request, elezione_id, candidato_id):
     elezione = get_object_or_404(Elezione, pk=elezione_id)
     candidato = get_object_or_404(Candidato, pk=candidato_id)

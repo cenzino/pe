@@ -19,8 +19,8 @@
 {% block proiezione %}
         {% include 'includes/_proiezioni_info.html' with proeizione=proiezione %}
         <div class="row">
-            <div class="col-xs-2">
-               <div class="caption text-center pull-right" style="background-color: gold; width: 100%; margin-bottom: 4px;">
+            <div class="col-xs-3">
+               <div class="caption text-center pull-right" style="background-color: #8dc63f; width: 100%; margin-bottom: 4px;">
                         {% with voti=candidato.voti_liste %}
                         <h1 class="h1 perc" style="margin: 0; margin-right: -20px; padding-top: 15px; font-weight: bold;">{{ voti|floatformat:1 }}<small>%</small></h1>
                         {% with forbice=candidato.forbice_liste %}
@@ -33,7 +33,7 @@
                 </div>
                 {% include 'includes/_proiezioni_candidato.html' with candidato=candidato %}
             </div>
-            <div class="col-xs-5" style="border: 5px solid gold; margin-left: -10px;">
+            <div class="col-xs-7" style="border: 5px solid #8dc63f; margin-left: -10px;">
                 <div class="container-fluid">
                     <div class="row">
                         {% for l in liste %}
@@ -41,7 +41,7 @@
 
                             {% with lista=l.lista %}
                                 <div class="thumbnail text-center" style="">
-                                    <img src="{{ MEDIA_URL }}{{ lista.simbolo|default:"images/default.gif" }}" alt="..." class="img-circle img-responsive" style="width: 85%">
+                                    <img src="{{ MEDIA_URL }}{{ lista.simbolo|default:"images/default.gif" }}" alt="..." class="img-circle img-responsive" style="width: 55%">
 
                                     <div class="caption text-center" style="margin: 0; padding: 0">
                                         {% with voti=l.voti %}
@@ -61,7 +61,7 @@
                     </div>
                 </div>
             </div>
-
+{% comment %}
                 <div class="col-xs-3">
                     <img src="{% static 'images/logo-demoskopika-big.jpg' %}" class="img-responsive " style="max-width: 200px; margin:auto; margin-top: 50px;"/>
 
@@ -69,7 +69,7 @@
                         <img src="{% static 'images/tiesi-logo.png' %}" class="img-responsive" style="max-width: 90px; margin: auto; margin-top: 120px; "/>
                     </div>
                 </div>
-
+{% endcomment %}
         </div>
         <div class="row">
             <div class="col-xs-10 errore text-center" style="padding-top: 2px; padding-left: 105px;">

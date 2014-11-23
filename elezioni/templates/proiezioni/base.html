@@ -14,7 +14,8 @@
     <!-- Bootstrap core CSS -->
     <link href="{% static "bootstrap/dist/css/bootstrap-no-responsive-10.min.css" %}" rel="stylesheet">
 {#    <link href='http://fonts.googleapis.com/css?family=Roboto+Condensed:300italic,400italic,700italic,700,300,400' rel='stylesheet' type='text/css'>#}
-    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300,400italic,500,500italic,700italic,300italic|Roboto+Condensed:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>
+{#    <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300,400italic,500,500italic,700italic,300italic|Roboto+Condensed:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>#}
+    <!-- Custom styles for this template -->
     <!-- Custom styles for this template -->
     <!--
     <link href='http://fonts.googleapis.com/css?family=Roboto:400,700,300,400italic,500,500italic,700italic,300italic|Roboto+Condensed:300italic,400italic,700italic,400,300,700' rel='stylesheet' type='text/css'>
@@ -38,16 +39,25 @@
 
   <body>
     {% block nav %}
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="navbar navbar-default navbar-fixed-top" role="navigation">
       <div class="container">
         <div class="navbar-header">
+        {% comment %}
           <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
             <span class="sr-only">Toggle navigation</span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="navbar-brand" style="margin-top: 6px;" href="{% url 'home' %}">{% block brand %}{{ elezione }}{% endblock %}</a>
+          {% endcomment %}
+          <a class="navbar-brand" style="margin-top: -10px;" href="{% url 'home' %}">
+
+              <img src="{% static 'images/logo.png' %}" style="width: 160px; margin-left: -10px;"/>
+
+          </a>
+            <p class="navbar-text title">Proiezione {% block brand %}Presidente{% endblock %}</p>
+          <p class="navbar-text title"><img src="{% static 'images/tiesi-logo.png' %}" class="" style="width: 60px"/></p>
+{#            <img src="{% static 'images/tiesi-logo.png' %}" class="img-responsive logo-tiesi pull-right" style="width: 120px;"/>#}
         </div>
         <div class="collapse navbar-collapse">
             {% comment %}
@@ -91,11 +101,15 @@
     </div>
 
     {% endblock %}
+       <div class="page-title">
+           <div class="container">
+               <h2>{{ elezione }}</h2>
+           </div>
+
+{#          <h2>Proiezione {% block pagetitle %}Presidente{% endblock %}</h2>#}
+       </div>
 
     <div class="container">
-       <div class="page-title">
-          <h1>Proiezione {% block pagetitle %}Presidente{% endblock %}</h1>
-       </div>
     {% block content %}
           {% block proiezione %}
           <div class="row">
@@ -144,11 +158,6 @@
     {% endblock %}
     </div>
 
-    <!-- /.container -->
-      <footer class="footer text-center text-muted">
-        <!-- <img src="{% static "images/tiesi-logo.png" %}" class="" style="width:60px;"/> -->
-        <p class="small">Centro Elaborazione Dati – TI&SI Srl</p>
-      </footer>
 
     <!-- Bootstrap core JavaScript
     ================================================== -->

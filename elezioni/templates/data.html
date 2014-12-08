@@ -17,10 +17,10 @@
             <th>Votanti</th>
             <th>Bianche</th>
             <th>Nulle</th>
-            {% for vc in sezione.voticandidato_set.all %}
+            {% for vc in sezione.voticandidato_set.all|dictsort:"candidato.cognome" %}
                 <th>{{ vc.candidato }}</th>
             {% endfor %}
-            {% for vl in sezione.votilista_set.all %}
+            {% for vl in sezione.votilista_set.all|dictsort:"lista.candidato.cognome" %}
                 <th>{{ vl.lista }}<br>({{ vl.lista.candidato }})</th>
             {% endfor %}
         </tr>
@@ -32,10 +32,10 @@
         <td>{{ sezione.votanti }}</td>
         <td>{{ sezione.schede_bianche }}</td>
         <td>{{ sezione.schede_nulle }}</td>
-        {% for vc in sezione.voticandidato_set.all %}
+        {% for vc in sezione.voticandidato_set.all|dictsort:"candidato.cognome" %}
             <td>{{ vc.voti }}</td>
         {% endfor %}
-        {% for vl in sezione.votilista_set.all %}
+        {% for vl in sezione.votilista_set.all|dictsort:"lista.candidato.cognome" %}
             <td>{{ vl.voti }}</td>
         {% endfor %}
     </tr>

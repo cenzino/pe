@@ -13,6 +13,10 @@
         <tr>
             <th>Numero</th>
             <th>Sezione</th>
+            <th>Iscritti</th>
+            <th>Votanti</th>
+            <th>Bianche</th>
+            <th>Nulle</th>
             {% for vc in sezione.voticandidato_set.all %}
                 <th>{{ vc.candidato }}</th>
             {% endfor %}
@@ -24,6 +28,10 @@
     <tr>
         <td>{{ sezione.numero}}</td>
         <td>{{ sezione.nome }}</td>
+        <td>{{ sezione.iscritti }}</td>
+        <td>{{ sezione.votanti }}</td>
+        <td>{{ sezione.schede_bianche }}</td>
+        <td>{{ sezione.schede_nulle }}</td>
         {% for vc in sezione.voticandidato_set.all %}
             <td>{{ vc.voti }}</td>
         {% endfor %}

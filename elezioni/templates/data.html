@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+{{ elezione }}
+
+<table border="1">
+{% for sezione in elezione.sezioni.all %}
+    {% if forloop.first %}
+        <tr>
+            <th>Numero</th>
+            <th>Sezione</th>
+            {% for vc in sezione.voticandidato_set.all %}
+                <th>{{ vc.candidato }}</th>
+            {% endfor %}
+            {% for vl in sezione.votilista_set.all %}
+                <th>{{ vl.lista }}<br>({{ vl.lista.candidato }})</th>
+            {% endfor %}
+        </tr>
+    {% endif %}
+    <tr>
+        <td>{{ sezione.numero}}</td>
+        <td>{{ sezione.nome }}</td>
+        {% for vc in sezione.voticandidato_set.all %}
+            <td>{{ vc.voti }}</td>
+        {% endfor %}
+        {% for vl in sezione.votilista_set.all %}
+            <td>{{ vl.voti }}</td>
+        {% endfor %}
+    </tr>
+{% endfor %}
+</table>
+</body>
+</html>

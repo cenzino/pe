@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 
 urlpatterns = patterns('',
     url(r'^$', views.home, name='home'),
+    url(r'^(?P<elezione_id>\d+)/data$', views.data, name='data'),
     #url(r'^(?P<elezione_id>\d+)/$', views.dettaglio, name='dettaglio'),
 
     url(r'^proiezioni/(?P<elezione_id>\d+)/p/$', views.crea_proiezione, name='crea_proiezione'),

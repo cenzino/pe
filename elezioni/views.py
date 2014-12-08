@@ -19,6 +19,11 @@ def is_member_of(user, group_name, exclusive=True):
 def has_only_perm(user, perm_name):
     user.get_all_permissions().intersection(config.DEFAULT_SYSTEM_PERMISSIONS_NAME).difference(set([u'elezioni.%s' % (perm_name)]))
 
+def data(request, elezione_id):
+    elezione = get_object_or_404(Elezione, pk=elezione_id)
+    return render(request, 'data.html', { 'elezione': elezione })
+
+
 @login_required(login_url='/login/')
 def home(request):
     user = request.user
